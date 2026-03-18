@@ -22,9 +22,11 @@ import * as SQLite from 'expo-sqlite';
 // Implemented modules
 export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
 export { addPoints, deductPoints, getPoints, setPoints } from './userState.js';
-// export { insert functions here } from './achievements.js';
-// export { insert functions here } from './skins.js';
-// export { insert functions here } from './diceSets.js';
+
+// Placeholder exports - to be implemented by respective team members
+// diceSets.js - Issues #17, #18
+// skins.js - Issues #24-27, #39 (dallasWed)
+// achievements.js - Issues #28-31, #39 (dallasWed)
 
 
 const DB_NAME = 'diceRoller.db';
