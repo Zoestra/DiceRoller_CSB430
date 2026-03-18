@@ -57,3 +57,25 @@ export async function deductPoints(amount) {
   await addPoints(-amount);
   return true;
 }
+
+/**
+ * Get active dice set ID
+ * @returns {Promise<number|null>}
+ */
+export async function getActiveSetId() {
+  const database = await getDB();
+  const result = await database.getFirstAsync('SELECT active_set_id FROM user_state WHERE id = 1');
+  return result?.active_set_id ?? null;
+}
+
+/**
+ * Set active dice set ID
+ * @param {number|null} setId - Dice set ID to set as active
+ */
+export async function setActiveSetId(setId) {
+  const database = await getDB();
+  await database.runAsync(
+    'UPDATE user_state SET active_set_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1',
+    [setId]
+  );
+}

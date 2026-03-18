@@ -41,6 +41,16 @@ CREATE TABLE IF NOT EXISTS roll_history (
 );
 
 -- ============================================
+-- TRIGGER: after_roll_insert
+-- Auto-increment total_rolls when a roll is inserted
+-- ============================================
+CREATE TRIGGER IF NOT EXISTS after_roll_insert
+AFTER INSERT ON roll_history
+BEGIN
+  UPDATE user_state SET total_rolls = total_rolls + 1 WHERE id = 1;
+END;
+
+-- ============================================
 -- TABLE: user_achievements
 -- Tracks achievement progress and completions
 -- ============================================
@@ -62,8 +72,10 @@ CREATE TABLE IF NOT EXISTS user_state (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   points INTEGER NOT NULL DEFAULT 100,
   total_rolls INTEGER NOT NULL DEFAULT 0,
+  active_set_id INTEGER,
   dark_mode INTEGER NOT NULL DEFAULT 0,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (active_set_id) REFERENCES dice_sets(id)
 );
 
 -- ============================================
@@ -116,5 +128,5 @@ VALUES
 -- SEED DATA
 -- Default user state
 -- ============================================
-INSERT OR IGNORE INTO user_state (id, points, total_rolls, dark_mode)
-VALUES (1, 100, 0, 0);
+INSERT OR IGNORE INTO user_state (id, points, total_rolls, active_set_id, dark_mode)
+VALUES (1, 100, 0, 1, 0);

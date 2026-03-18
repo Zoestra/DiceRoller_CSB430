@@ -21,7 +21,7 @@ import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
 export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
-export { addPoints, deductPoints, getPoints, setPoints } from './userState.js';
+export { addPoints, deductPoints, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
 
 // Placeholder exports - to be implemented by respective team members
 // diceSets.js - Issues #17, #18
@@ -40,18 +40,21 @@ let db = null;
 export async function getDB() {
   if (!db) {
     db = await SQLite.openDatabaseAsync(DB_NAME);
-    await initSchema();
+    // Enable foreign key enforcement (SQLite has it off by default)
+    await db.runAsync('PRAGMA foreign_keys = ON');
+    await initSchema(db);
   }
   return db;
 }
 
 /**
  * Load and execute the schema from init-db.sql
+ * @param {SQLite.SQLiteDatabase} database - Database connection to use
  */
-async function initSchema() {
-  const database = await getDB();
+async function initSchema(database) {
   const schemaUri = Asset.fromModule(require('./init-db.sql')).uri;
-  const schema = await fetch(schemaUri).then(r => r.text());
+  const response = await fetch(schemaUri);
+  const schema = await response.text();
   await database.execAsync(schema);
   console.log('Database schema initialized from init-db.sql');
 }

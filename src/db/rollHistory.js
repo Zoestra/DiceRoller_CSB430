@@ -22,7 +22,7 @@ export async function insertRoll(setId, dieType, result) {
     'INSERT INTO roll_history (set_id, die_type, result) VALUES (?, ?, ?)',
     [setId, dieType, result]
   );
-  await database.runAsync('UPDATE user_state SET total_rolls = total_rolls + 1 WHERE id = 1');
+  // total_rolls is auto-incremented by after_roll_insert trigger
 }
 
 /**
@@ -59,7 +59,7 @@ export async function getDiceSetStats(setId) {
       AVG(result) as average,
       MIN(result) as min_roll,
       MAX(result) as max_roll,
-      SUM(CASE WHEN result = 20 THEN 1 ELSE 0 END) as nat_20s,
+      SUM(CASE WHEN result = die_type THEN 1 ELSE 0 END) as max_rolls,
       SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) as nat_1s
     FROM roll_history
     WHERE set_id = ?
