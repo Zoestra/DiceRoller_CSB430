@@ -1,7 +1,8 @@
 /**
- * Database Module - Core Initialization
+ * Database Module - Connection Management
  *
- * Handles database connection and schema initialization.
+ * Provides a cache for the database connection.
+ * Database must be initialized via initializeDatabase() at app startup.
  * Also re-exports all query functions from their respective modules.
  *
  * Query modules:
@@ -16,51 +17,35 @@
  * ---
  */
 
-import { Asset } from 'expo-asset';
 import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
 export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
 export { addPoints, deductPoints, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
 
-// Placeholder exports - to be implemented by respective team members
-// diceSets.js - Issues #17, #18
-// skins.js - Issues #24-27, #39 (dallasWed)
-// achievements.js - Issues #28-31, #39 (dallasWed)
-
-
 const DB_NAME = 'diceRoller.db';
 
 let db = null;
 
 /**
- * Initialize the database connection
+ * Get cached database connection
+ *
+ * Assumes the database was initialized via `npm run initialize` at setup time.
+ * On first call, opens the database file.
+ * On subsequent calls, returns cached connection.
+ *
  * @returns {Promise<SQLite.SQLiteDatabase>}
  */
 export async function getDB() {
   if (!db) {
     db = await SQLite.openDatabaseAsync(DB_NAME);
-    // Enable foreign key enforcement (SQLite has it off by default)
-    await db.runAsync('PRAGMA foreign_keys = ON');
-    await initSchema(db);
   }
   return db;
 }
 
 /**
- * Load and execute the schema from init-db.sql
- * @param {SQLite.SQLiteDatabase} database - Database connection to use
- */
-async function initSchema(database) {
-  const schemaUri = Asset.fromModule(require('./init-db.sql')).uri;
-  const response = await fetch(schemaUri);
-  const schema = await response.text();
-  await database.execAsync(schema);
-  console.log('Database schema initialized from init-db.sql');
-}
-
-/**
- * Reset the database (for testing/development)
+ * Reset the database (for testing/development only)
+ * Drops all tables and recreates from schema
  */
 export async function resetDatabase() {
   const database = await getDB();
@@ -72,5 +57,4 @@ export async function resetDatabase() {
     DROP TABLE IF EXISTS user_state;
   `);
   db = null;
-  await getDB();
 }
