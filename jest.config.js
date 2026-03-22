@@ -14,7 +14,8 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(sql)$': '<rootDir>/jest.setup.js',
+    '^expo-sqlite$': '<rootDir>/src/db/__tests__/mocks/expo-sqlite.js',
+    '\\.(sql)$': '<rootDir>/src/db/__tests__/mocks/sql-file.js',
   },
   testMatch: ['**/__tests__/**/*.test.js', '**/?(*.)+(test).js'],
 };
