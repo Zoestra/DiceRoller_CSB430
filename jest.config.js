@@ -17,4 +17,8 @@ module.exports = {
     '\\.(sql)$': '<rootDir>/jest.setup.js',
   },
   testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(test).js'],
+  // Reset mocks before each test file
+  resetMocks: true,
+  // Clear modules to ensure mocks are applied correctly
+  resetModules: true,
 };

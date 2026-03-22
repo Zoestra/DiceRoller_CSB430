@@ -10,14 +10,19 @@
  * ---
  */
 
+// Mock expo-sqlite BEFORE any imports that use it
+jest.mock('expo-sqlite', () => ({
+  openDatabaseAsync: jest.fn(),
+}));
+
 import * as SQLite from 'expo-sqlite';
 import {
-  getPoints,
-  deductPoints,
-  getActiveSetId,
-  getRollHistory,
-  getDiceSetStats,
-  getRollDistribution,
+    deductPoints,
+    getActiveSetId,
+    getDiceSetStats,
+    getPoints,
+    getRollDistribution,
+    getRollHistory,
 } from '../db.js';
 
 describe('User State Operations', () => {
