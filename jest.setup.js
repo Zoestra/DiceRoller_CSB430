@@ -1,77 +1,105 @@
 /**
- * Jest Mock Setup - runs BEFORE test files are loaded
+ * Jest Setup File
  *
- * This file sets up mocks that must be in place before any imports happen.
+ * Sets up mocks and test utilities.
  *
  * ---
  * NOTE: This file was written with AI assistance (Qwen Code).
  * ---
  */
 
-import Database from 'better-sqlite3';
-
-// Create in-memory database - using 'mock' prefix so Jest allows access in mock factory
-const mockTestDb = new Database(':memory:');
-
-// Create tables
-mockTestDb.exec(`
-  CREATE TABLE IF NOT EXISTS dice_sets (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    set_name TEXT NOT NULL,
-    attitude TEXT NOT NULL DEFAULT 'Balanced',
-    owned INTEGER NOT NULL DEFAULT 0,
-    equipped INTEGER NOT NULL DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-  CREATE TABLE IF NOT EXISTS roll_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    set_id INTEGER NOT NULL,
-    die_type INTEGER NOT NULL,
-    result INTEGER NOT NULL,
-    rolled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (set_id) REFERENCES dice_sets(id)
-  );
-  CREATE TABLE IF NOT EXISTS user_state (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    points INTEGER NOT NULL DEFAULT 100,
-    total_rolls INTEGER NOT NULL DEFAULT 0,
-    active_set_id INTEGER,
-    dark_mode INTEGER NOT NULL DEFAULT 0,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-`);
-
-// Insert initial user state
-mockTestDb.exec(`INSERT INTO user_state (id, points, total_rolls, dark_mode) VALUES (1, 100, 0, 0)`);
-
-// Make the database globally available for tests
-global.mockTestDb = mockTestDb;
-
-// Mock expo-sqlite to use better-sqlite3
-jest.mock('expo-sqlite', () => ({
-  openDatabaseAsync: jest.fn().mockResolvedValue({
-    getFirstAsync: jest.fn(function(sql, params) {
-      const stmt = mockTestDb.prepare(sql);
-      const row = params ? stmt.get(...params) : stmt.get();
-      return Promise.resolve(row);
+// Mock expo-sqlite with simple in-memory implementation
+jest.mock('expo-sqlite', () => {
+  const mockTables = {
+    user_state: [{ id: 1, points: 100, total_rolls: 0, active_set_id: null, dark_mode: 0 }],
+    roll_history: [],
+  };
+  
+  // Expose mockTables and reset function globally
+  global._mockTables = mockTables;
+  global._resetMockTables = () => {
+    mockTables.user_state[0] = { id: 1, points: 100, total_rolls: 0, active_set_id: null, dark_mode: 0 };
+    mockTables.roll_history.splice(0);
+  };
+  
+  return {
+    openDatabaseAsync: jest.fn().mockResolvedValue({
+      getFirstAsync: jest.fn((sql, params) => {
+        if (sql.includes('user_state')) {
+          const row = mockTables.user_state[0];
+          return Promise.resolve(row ? { ...row } : undefined);
+        }
+        if (sql.includes('dice_sets') && sql.includes('active_set_id')) {
+          const row = mockTables.user_state[0];
+          return Promise.resolve(row ? { active_set_id: row.active_set_id } : undefined);
+        }
+        if (sql.includes('roll_history') && sql.includes('COUNT')) {
+          const setId = params?.[0];
+          const rows = mockTables.roll_history.filter(r => r.set_id === setId);
+          return Promise.resolve({
+            total_rolls: rows.length,
+            average: rows.length ? rows.reduce((s, r) => s + r.result, 0) / rows.length : 0,
+            min_roll: rows.length ? Math.min(...rows.map(r => r.result)) : 0,
+            max_roll: rows.length ? Math.max(...rows.map(r => r.result)) : 0,
+          });
+        }
+        return Promise.resolve(undefined);
+      }),
+      getAllAsync: jest.fn((sql, params) => {
+        if (sql.includes('roll_history') && sql.includes('GROUP BY')) {
+          const setId = params?.[0];
+          const rows = mockTables.roll_history.filter(r => r.set_id === setId);
+          const grouped = {};
+          rows.forEach(r => {
+            grouped[r.result] = (grouped[r.result] || 0) + 1;
+          });
+          return Promise.resolve(Object.entries(grouped).map(([result, count]) => ({
+            result: parseInt(result),
+            count,
+          })));
+        }
+        if (sql.includes('roll_history')) {
+          const setId = params?.[0];
+          const limit = params?.[1];
+          let rows = mockTables.roll_history.filter(r => r.set_id === setId);
+          rows = rows.slice(0, limit || rows.length);
+          return Promise.resolve(rows.map(r => ({ ...r })));
+        }
+        return Promise.resolve([]);
+      }),
+      runAsync: jest.fn((sql, params) => {
+        if (sql.includes('UPDATE user_state')) {
+          if (sql.includes('points = points +')) {
+            mockTables.user_state[0].points += params[0];
+          } else if (sql.includes('points = ?')) {
+            mockTables.user_state[0].points = params[0];
+          }
+          if (sql.includes('total_rolls = total_rolls +')) {
+            mockTables.user_state[0].total_rolls += params[0];
+          }
+          if (sql.includes('active_set_id = ?')) {
+            mockTables.user_state[0].active_set_id = params[params.length - 1];
+          }
+          return Promise.resolve({});
+        }
+        if (sql.includes('INSERT INTO roll_history')) {
+          const [setId, dieType, result] = params;
+          mockTables.roll_history.push({
+            id: mockTables.roll_history.length + 1,
+            set_id: setId,
+            die_type: dieType,
+            result,
+          });
+          mockTables.user_state[0].total_rolls += 1;
+          return Promise.resolve({});
+        }
+        if (sql.includes('DELETE FROM roll_history')) {
+          mockTables.roll_history.splice(0);
+          return Promise.resolve({});
+        }
+        return Promise.resolve({});
+      }),
+      execAsync: jest.fn(() => Promise.resolve()),
     }),
-    getAllAsync: jest.fn(function(sql, params) {
-      const stmt = mockTestDb.prepare(sql);
-      const rows = params ? stmt.all(...params) : stmt.all();
-      return Promise.resolve(rows);
-    }),
-    runAsync: jest.fn(function(sql, params) {
-      const stmt = mockTestDb.prepare(sql);
-      if (params) {
-        stmt.run(...params);
-      } else {
-        stmt.run();
-      }
-      return Promise.resolve({});
-    }),
-    execAsync: jest.fn(function(sql) {
-      mockTestDb.exec(sql);
-      return Promise.resolve();
-    }),
-  }),
-}));
+  };
+});
