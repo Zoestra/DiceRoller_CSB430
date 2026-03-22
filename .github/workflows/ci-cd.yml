@@ -80,7 +80,7 @@ jobs:
           fi
 
       - name: Build with EAS
-        run: npx eas-cli@13.6.0 build --platform all --non-interactive
+        run: npx --yes eas-cli@18.4.0 build --platform all --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
