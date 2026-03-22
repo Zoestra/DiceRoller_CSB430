@@ -58,3 +58,7 @@ export async function resetDatabase() {
   `);
   db = null;
 }
+
+export function __resetDbForTests() {
+  db = null;
+}

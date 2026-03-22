@@ -7,13 +7,14 @@ const mockTables = {
   roll_history: [],
 };
 
-global._mockTables = mockTables;
-global._resetMockTables = () => {
+function resetMockTables() {
   mockTables.user_state[0] = { id: 1, points: 100, total_rolls: 0, active_set_id: null, dark_mode: 0 };
   mockTables.roll_history.splice(0);
-};
+}
 
 module.exports = {
+  __mockTables: mockTables,
+  __resetMockTables: resetMockTables,
   openDatabaseAsync: jest.fn().mockResolvedValue({
     getFirstAsync: jest.fn((sql, params) => {
       if (sql.includes('user_state')) {

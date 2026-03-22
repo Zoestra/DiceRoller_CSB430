@@ -2,7 +2,6 @@
  * Database CRUD Tests
  *
  * Tests for core database operations using in-memory mocks.
- * Tests are designed to work without state reset between tests.
  *
  * ---
  * NOTE: This file was written with AI assistance (Qwen Code).
@@ -10,6 +9,7 @@
  */
 
 import {
+  __resetDbForTests,
   addPoints,
   deductPoints,
   getActiveSetId,
@@ -20,6 +20,12 @@ import {
   insertRoll,
   setPoints,
 } from '../db.js';
+import { __resetMockTables } from './mocks/expo-sqlite.js';
+
+beforeEach(() => {
+  __resetMockTables();
+  __resetDbForTests();
+});
 
 describe('User State Operations', () => {
   test('getPoints returns a number', async () => {
@@ -28,9 +34,8 @@ describe('User State Operations', () => {
   });
 
   test('getPoints defaults to 100 when no data exists', async () => {
-    // This test should run first to check default
     const result = await getPoints();
-    expect(result).toBeGreaterThanOrEqual(100);
+    expect(result).toBe(100);
   });
 
   test('deductPoints returns boolean', async () => {
