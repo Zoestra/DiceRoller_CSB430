@@ -9,11 +9,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.queenzoestra.dicerollercsb430"
+      "supportsTablet": true
     },
     "android": {
-      "package": "com.queenzoestra.dicerollercsb430",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -48,11 +46,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "ae23163f-e0d7-403b-a6b6-b7739fbe9a2e"
-      }
-    },
-    "owner": "queenzoestra"
+      "router": {}
+    }
   }
 }
