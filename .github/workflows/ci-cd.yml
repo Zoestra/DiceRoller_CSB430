@@ -71,4 +71,3 @@ jobs:
         run: npx eas build --platform all --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        continue-on-error: true
