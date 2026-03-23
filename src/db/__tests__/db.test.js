@@ -33,6 +33,7 @@ beforeEach(async function () {
   await createFreshTestDatabase();
   __setOpenDatabaseForTests(getOpenDatabaseAsyncForTests());
 });
+
 afterEach(async function () {
   await teardownTestDatabase();
 });
@@ -42,6 +43,7 @@ afterAll(function () {
 });
 
 describe('User State Operations', function () {
+
   test('getPoints returns a number', async function () {
     const result = await getPoints();
     expect(typeof result).toBe('number');

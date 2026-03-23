@@ -14,11 +14,11 @@
 
 import { getDB } from './db.js';
 
-// Get all skins, sorting owned sets to the top of the list
+// Get all skins
 export async function getAllSkins() {
     const database = await getDB();
     return await database.getAllAsync(
-        'SELECT * FROM skins ORDER BY owned DESC, skin_name ASC'
+        'SELECT * FROM skins'
     );
 }
 
@@ -30,3 +30,5 @@ export async function getSkinByID(skinID) {
         skinID
     );
 }
+
+//

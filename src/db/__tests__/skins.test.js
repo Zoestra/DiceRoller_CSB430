@@ -28,9 +28,12 @@ describe('Dice Shop Operations', function () {
     expect(result.skin_name).toBe('Classic');
     expect(result.skin_description).toBe('Default skin');
     expect(result.skin_folder).toBe('classic');
-    expect(result.owned).toBe(1);
-    // expect(result.equipped).toBe(1);
   });
 
+  test('getAllSkins returns an array of skins', async function () {
+    const result = await getAllSkins();
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThan(0);
+  });
 
 });

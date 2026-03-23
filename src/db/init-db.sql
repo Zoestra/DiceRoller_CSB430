@@ -1,19 +1,6 @@
 -- NOTE: This file was written with AI assistance (Qwen Code).
 
 -- ============================================
--- TABLE: dice_sets
--- Stores all dice sets with their attitudes
--- ============================================
-CREATE TABLE IF NOT EXISTS dice_sets (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  set_name TEXT NOT NULL,
-  attitude TEXT NOT NULL DEFAULT 'Balanced',
-  owned INTEGER NOT NULL DEFAULT 0,
-  equipped INTEGER NOT NULL DEFAULT 0,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- ============================================
 -- TABLE: skins
 -- Stores cosmetic skins for dice
 -- ============================================
@@ -22,9 +9,23 @@ CREATE TABLE IF NOT EXISTS skins (
   skin_name TEXT NOT NULL,
   skin_description TEXT,
   skin_folder TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- TABLE: dice_sets
+-- Stores all dice sets with their attitudes
+-- ============================================
+CREATE TABLE IF NOT EXISTS dice_sets (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  set_name TEXT NOT NULL,
+  set_skin INTEGER NOT NULL DEFAULT 1,
+  attitude TEXT NOT NULL DEFAULT 'Balanced',
+  price INTEGER NOT NULL DEFAULT 10,
   owned INTEGER NOT NULL DEFAULT 0,
   equipped INTEGER NOT NULL DEFAULT 0,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (set_skin) REFERENCES skins(id)
 );
 
 -- ============================================
@@ -88,16 +89,27 @@ CREATE INDEX IF NOT EXISTS idx_roll_history_result ON roll_history(result);
 
 -- ============================================
 -- SEED DATA
+-- Default skins
+-- ============================================
+INSERT OR IGNORE INTO skins (skin_name, skin_description, skin_folder)
+VALUES
+  ('Classic', 'Default skin', 'classic'),
+  ('Golden', 'Shiny gold appearance', 'golden'),
+  ('Obsidian', 'Dark and mysterious', 'obsidian'),
+  ('Crystal', 'Translucent gemstone look', 'crystal');
+
+-- ============================================
+-- SEED DATA
 -- Default dice sets
 -- ============================================
-INSERT OR IGNORE INTO dice_sets (set_name, attitude, owned, equipped)
+INSERT OR IGNORE INTO dice_sets (set_name, attitude, owned, equipped, set_skin, price)
 VALUES
-  ('Classic', 'Balanced', 1, 1),
-  ('Lucky', 'Lucky', 0, 0),
-  ('Cursed', 'Cursed', 0, 0),
-  ('Chaotic', 'Chaotic', 0, 0),
-  ('Betrayer', 'Betrayer', 0, 0),
-  ('Mid', 'Mid', 0, 0);
+  ('Classic', 'Balanced', 1, 1, 1, 0),
+  ('Lucky', 'Lucky', 0, 0, 2, 100),
+  ('Cursed', 'Cursed', 0, 0, 3, 10),
+  ('Chaotic', 'Chaotic', 0, 0, 1, 50),
+  ('Betrayer', 'Betrayer', 0, 0, 2, 100),
+  ('Mid', 'Mid', 0, 0, 3, 50);
 
 -- ============================================
 -- SEED DATA
@@ -112,17 +124,6 @@ VALUES
   ('Millennium', 'Roll the dice 1000 times', 'total_rolls_1000', 'millennium.png', 200),
   ('Low Roller', 'Roll a natural 1', 'low_roller', 'low_roller.png', 15),
   ('High Roller', 'Accumulate 1000 total points', 'high_roller', 'high_roller.png', 150);
-
--- ============================================
--- SEED DATA
--- Default skins
--- ============================================
-INSERT OR IGNORE INTO skins (skin_name, skin_description, skin_folder, owned)
-VALUES
-  ('Classic', 'Default skin', 'classic', 1),
-  ('Golden', 'Shiny gold appearance', 'golden', 0),
-  ('Obsidian', 'Dark and mysterious', 'obsidian', 0),
-  ('Crystal', 'Translucent gemstone look', 'crystal', 0);
 
 -- ============================================
 -- SEED DATA
