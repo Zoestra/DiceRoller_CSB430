@@ -21,7 +21,7 @@ import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
 export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
-export { addPoints, deductPoints, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
+export { addPoints, deductPoints, DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
 
 const DB_NAME = 'diceRoller.db';
 

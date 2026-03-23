@@ -10,11 +10,10 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import { getActiveSetId, getPoints, setActiveSetId, setPoints } from '@/db/db.js';
+import { DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from '@/db/db.js';
 
 const DiceContext = createContext(null);
 
-const DEFAULT_POINTS = 100;
 const DEFAULT_EQUIPPED_SET_ID = 1;
 const DEFAULT_ACTIVE_DIE_TYPE = 20;
 

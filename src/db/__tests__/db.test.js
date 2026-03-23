@@ -10,7 +10,7 @@
  */
 
 import {
-  __resetDbForTests,
+  DEFAULT_POINTS,
   __restoreOpenDatabaseForTests,
   __setOpenDatabaseForTests,
   addPoints,
@@ -21,7 +21,7 @@ import {
   getRollDistribution,
   getRollHistory,
   insertRoll,
-  setPoints,
+  setPoints
 } from '../db.js';
 import {
   createFreshTestDatabase,
@@ -47,9 +47,9 @@ describe('User State Operations', function () {
     expect(typeof result).toBe('number');
   });
 
-  test('getPoints returns seeded default of 100', async function () {
+  test('getPoints returns seeded default points', async function () {
     const result = await getPoints();
-    expect(result).toBe(100);
+    expect(result).toBe(DEFAULT_POINTS);
   });
 
   test('deductPoints returns boolean', async function () {

@@ -10,6 +10,8 @@
 
 import { getDB } from './db.js';
 
+export const DEFAULT_POINTS = 0;
+
 /**
  * Get current user points
  * @returns {Promise<number>}
@@ -17,7 +19,7 @@ import { getDB } from './db.js';
 export async function getPoints() {
   const database = await getDB();
   const result = await database.getFirstAsync('SELECT points FROM user_state WHERE id = 1');
-  return result?.points ?? 100;
+  return result?.points ?? DEFAULT_POINTS;
 }
 
 /**

@@ -21,6 +21,7 @@ import {
     __resetDbForTests,
     __restoreOpenDatabaseForTests,
     __setOpenDatabaseForTests,
+    DEFAULT_POINTS,
     getActiveSetId,
     getPoints,
     setActiveSetId,
@@ -49,20 +50,18 @@ describe('DiceContext', function () {
   });
 
   test('useDiceContext throws outside provider', function () {
-    let thrownErrorMessage = null;
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(function () {});
 
     function BareConsumer() {
       useDiceContext();
       return null;
     }
 
-    try {
+    expect(function renderBareConsumer() {
       render(<BareConsumer />);
-    } catch (error) {
-      thrownErrorMessage = error.message;
-    }
+    }).toThrow('useDiceContext must be used within a DiceProvider');
 
-    expect(thrownErrorMessage).toContain('useDiceContext must be used within a DiceProvider');
+    errorSpy.mockRestore();
   });
 
   test('loads seeded database state on mount', async function () {
@@ -76,7 +75,7 @@ describe('DiceContext', function () {
 
     await waitFor(function () {
       expect(latestContext).not.toBeNull();
-      expect(latestContext.points).toBe(100);
+      expect(latestContext.points).toBe(DEFAULT_POINTS);
       expect(latestContext.equippedSetId).toBe(1);
       expect(latestContext.activeDieType).toBe(20);
     });
@@ -93,7 +92,7 @@ describe('DiceContext', function () {
 
     await waitFor(function () {
       expect(latestContext).not.toBeNull();
-      expect(latestContext.points).toBe(100);
+      expect(latestContext.points).toBe(DEFAULT_POINTS);
     });
 
     await act(async function () {
@@ -154,7 +153,7 @@ describe('DiceContext', function () {
       expect(latestContext.activeDieType).toBe(6);
     });
 
-    expect(await getPoints()).toBe(100);
+    expect(await getPoints()).toBe(DEFAULT_POINTS);
     expect(await getActiveSetId()).toBe(1);
   });
 
