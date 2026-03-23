@@ -2,7 +2,7 @@
  * Jest Configuration for DiceRoller_CSB430
  *
  * ---
- * NOTE: This file was created with AI assistance (Qwen Code).
+ * NOTE: This file was created with AI assistance (Qwen Code, GitHub Copilot).
  * ---
  */
 
@@ -14,8 +14,6 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^expo-sqlite$': '<rootDir>/src/db/__tests__/mocks/expo-sqlite.js',
-    '\\.(sql)$': '<rootDir>/src/db/__tests__/mocks/sql-file.js',
   },
   testMatch: ['**/__tests__/**/*.test.js', '**/?(*.)+(test).js'],
 };
