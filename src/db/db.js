@@ -13,7 +13,7 @@
  *   - achievements.js: achievement queries (placeholder - dallasWed)
  *
  * ---
- * NOTE: This file was written with AI assistance (Qwen Code).
+ * NOTE: This file was written with AI assistance (Qwen Code, GitHub Copilot).
  * ---
  */
 
@@ -26,6 +26,7 @@ export { addPoints, deductPoints, getActiveSetId, getPoints, setActiveSetId, set
 const DB_NAME = 'diceRoller.db';
 
 let db = null;
+let openDatabaseAsyncFn = SQLite.openDatabaseAsync;
 
 /**
  * Get cached database connection
@@ -38,7 +39,7 @@ let db = null;
  */
 export async function getDB() {
   if (!db) {
-    db = await SQLite.openDatabaseAsync(DB_NAME);
+    db = await openDatabaseAsyncFn(DB_NAME);
   }
   return db;
 }
@@ -60,5 +61,15 @@ export async function resetDatabase() {
 }
 
 export function __resetDbForTests() {
+  db = null;
+}
+
+export function __setOpenDatabaseForTests(openDatabaseAsync) {
+  openDatabaseAsyncFn = openDatabaseAsync;
+  db = null;
+}
+
+export function __restoreOpenDatabaseForTests() {
+  openDatabaseAsyncFn = SQLite.openDatabaseAsync;
   db = null;
 }
