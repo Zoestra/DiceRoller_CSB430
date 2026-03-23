@@ -17,6 +17,20 @@ const DiceContext = createContext(null);
 const DEFAULT_EQUIPPED_SET_ID = 1;
 const DEFAULT_ACTIVE_DIE_TYPE = 20;
 
+/**
+ * @typedef {Object} DiceContextValue
+ * @property {number} points
+ * @property {number} equippedSetId
+ * @property {number} activeDieType
+ * @property {() => Promise<void>} refresh
+ * @property {(value: number) => Promise<void>} setPointsValue
+ * @property {(setId: number | null | undefined) => Promise<void>} setEquippedSetId
+ * @property {(dieType: number) => void} setActiveDieType
+ */
+
+/**
+ * @param {{ children: import('react').ReactNode }} props
+ */
 export function DiceProvider({ children }) {
   const [points, setPointsState] = useState(DEFAULT_POINTS);
   const [equippedSetId, setEquippedSetIdState] = useState(DEFAULT_EQUIPPED_SET_ID);
@@ -36,38 +50,53 @@ export function DiceProvider({ children }) {
     setEquippedSetIdState(normalizedSetId);
   }
 
+  /**
+   * @param {number} value
+   */
   async function setPointsValue(value) {
     await setPoints(value);
     await refreshStateFromDatabase();
   }
 
+  /**
+   * @param {number | null | undefined} setId
+   */
   async function setEquippedSetId(setId) {
     const normalizedSetId = setId ?? DEFAULT_EQUIPPED_SET_ID;
     await setActiveSetId(normalizedSetId);
     await refreshStateFromDatabase();
   }
 
+  /**
+   * @param {number} dieType
+   */
   function setActiveDieType(dieType) {
     setActiveDieTypeState(dieType);
   }
 
+  /** @type {DiceContextValue} */
+  /** @type {DiceContextValue} */
   const contextValue = {
-    points: points,
-    equippedSetId: equippedSetId,
-    activeDieType: activeDieType,
+    points,
+    equippedSetId,
+    activeDieType,
     refresh: refreshStateFromDatabase,
-    setPointsValue: setPointsValue,
-    setEquippedSetId: setEquippedSetId,
-    setActiveDieType: setActiveDieType,
+    setPointsValue,
+    setEquippedSetId,
+    setActiveDieType,
   };
 
   return <DiceContext.Provider value={contextValue}>{children}</DiceContext.Provider>;
 }
 
+/**
+ * @returns {DiceContextValue}
+ * @throws {Error} If called outside DiceProvider
+ */
 export function useDiceContext() {
   const context = useContext(DiceContext);
   if (context === null) {
-    throw new Error('useDiceContext must be used within a DiceProvider');
+    throw new Error('useDiceContext must be called within a DiceProvider');
   }
   return context;
 }

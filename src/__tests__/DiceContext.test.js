@@ -50,18 +50,14 @@ describe('DiceContext', function () {
   });
 
   test('useDiceContext throws outside provider', function () {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(function () {});
-
     function BareConsumer() {
       useDiceContext();
       return null;
     }
 
-    expect(function renderBareConsumer() {
+    expect(function () {
       render(<BareConsumer />);
-    }).toThrow('useDiceContext must be used within a DiceProvider');
-
-    errorSpy.mockRestore();
+    }).toThrow('useDiceContext must be called within a DiceProvider');
   });
 
   test('loads seeded database state on mount', async function () {
