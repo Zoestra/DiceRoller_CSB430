@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS achievements (
 -- ============================================
 CREATE TABLE IF NOT EXISTS user_state (
   id INTEGER PRIMARY KEY CHECK (id = 1),
-  points INTEGER NOT NULL DEFAULT 100,
+  points INTEGER NOT NULL DEFAULT 0,
   total_rolls INTEGER NOT NULL DEFAULT 0,
   active_set_id INTEGER,
   dark_mode INTEGER NOT NULL DEFAULT 0,
@@ -129,4 +129,4 @@ VALUES
 -- Default user state
 -- ============================================
 INSERT OR IGNORE INTO user_state (id, points, total_rolls, active_set_id, dark_mode)
-VALUES (1, 100, 0, 1, 0);
+VALUES (1, 0, 0, 1, 0);

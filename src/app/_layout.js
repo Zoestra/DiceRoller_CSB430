@@ -2,7 +2,7 @@
  * Root app layout and navigation shell.
  *
  * ---
- * NOTE: This file was written with AI assistance (GitHub Copilot).
+ * NOTE: This file was written with AI assistance (GitHub Copilot, GPT-5.3-Codex).
  * ---
  */
 
