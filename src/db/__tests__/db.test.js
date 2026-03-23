@@ -1,15 +1,18 @@
 /**
  * Database CRUD Tests
  *
- * Tests for core database operations using in-memory mocks.
+ * Tests for core database operations using a temporary SQLite database
+ * initialized from the production schema for each test.
  *
  * ---
- * NOTE: This file was written with AI assistance (Qwen Code).
+ * NOTE: This file was written with AI assistance (Qwen Code, GitHub Copilot).
  * ---
  */
 
 import {
   __resetDbForTests,
+  __restoreOpenDatabaseForTests,
+  __setOpenDatabaseForTests,
   addPoints,
   deductPoints,
   getActiveSetId,
@@ -20,47 +23,58 @@ import {
   insertRoll,
   setPoints,
 } from '../db.js';
-import { __resetMockTables } from './mocks/expo-sqlite.js';
+import {
+  createFreshTestDatabase,
+  getOpenDatabaseAsyncForTests,
+  teardownTestDatabase,
+} from './testDatabase.js';
 
-beforeEach(() => {
-  __resetMockTables();
-  __resetDbForTests();
+beforeEach(async function () {
+  await createFreshTestDatabase();
+  __setOpenDatabaseForTests(getOpenDatabaseAsyncForTests());
+});
+afterEach(async function () {
+  await teardownTestDatabase();
 });
 
-describe('User State Operations', () => {
-  test('getPoints returns a number', async () => {
+afterAll(function () {
+  __restoreOpenDatabaseForTests();
+});
+
+describe('User State Operations', function () {
+  test('getPoints returns a number', async function () {
     const result = await getPoints();
     expect(typeof result).toBe('number');
   });
 
-  test('getPoints defaults to 100 when no data exists', async () => {
+  test('getPoints returns seeded default of 100', async function () {
     const result = await getPoints();
     expect(result).toBe(100);
   });
 
-  test('deductPoints returns boolean', async () => {
+  test('deductPoints returns boolean', async function () {
     const result = await deductPoints(50);
     expect(typeof result).toBe('boolean');
   });
 
-  test('deductPoints returns false when balance insufficient', async () => {
+  test('deductPoints returns false when balance insufficient', async function () {
     // Try to deduct more than possible
     const result = await deductPoints(10000);
     expect(result).toBe(false);
   });
 
-  test('getActiveSetId returns null or number', async () => {
+  test('getActiveSetId returns null or number', async function () {
     const result = await getActiveSetId();
     expect(result === null || typeof result === 'number').toBe(true);
   });
 
-  test('setPoints updates points correctly', async () => {
+  test('setPoints updates points correctly', async function () {
     await setPoints(200);
     const result = await getPoints();
     expect(result).toBe(200);
   });
 
-  test('addPoints increases points', async () => {
+  test('addPoints increases points', async function () {
     const before = await getPoints();
     await addPoints(50);
     const after = await getPoints();
@@ -68,38 +82,40 @@ describe('User State Operations', () => {
   });
 });
 
-describe('Roll History Operations', () => {
-  test('getRollHistory returns an array', async () => {
+describe('Roll History Operations', function () {
+  test('getRollHistory returns an array', async function () {
     const result = await getRollHistory({ setId: 100 });
     expect(Array.isArray(result)).toBe(true);
   });
 
-  test('getRollHistory returns empty array when no data', async () => {
+  test('getRollHistory returns empty array when no data', async function () {
     const result = await getRollHistory({ setId: 9999 });
     expect(result).toEqual([]);
   });
 
-  test('insertRoll adds a roll to history', async () => {
-    const setId = 1001;
+  test('insertRoll adds a roll to history', async function () {
+    const setId = 1;
     await insertRoll(setId, 20, 15);
     const result = await getRollHistory({ setId });
     expect(result.length).toBeGreaterThanOrEqual(1);
     expect(result[0].result).toBe(15);
   });
 
-  test('getRollHistory items have expected shape', async () => {
-    const setId = 1002;
+  test('getRollHistory items have expected shape', async function () {
+    const setId = 2;
     await insertRoll(setId, 20, 15);
     const result = await getRollHistory({ setId });
-    const item = result.find(r => r.set_id === setId);
+    const item = result.find(function (r) {
+      return r.set_id === setId;
+    });
     expect(item).toHaveProperty('id');
     expect(item).toHaveProperty('set_id');
     expect(item).toHaveProperty('die_type');
     expect(item).toHaveProperty('result');
   });
 
-  test('getDiceSetStats returns an object with aggregates', async () => {
-    const setId = 1003;
+  test('getDiceSetStats returns an object with aggregates', async function () {
+    const setId = 3;
     await insertRoll(setId, 20, 10);
     await insertRoll(setId, 20, 15);
     await insertRoll(setId, 20, 20);
@@ -109,19 +125,23 @@ describe('Roll History Operations', () => {
     expect(result.total_rolls).toBe(3);
   });
 
-  test('getRollDistribution returns array of result groups', async () => {
-    const setId = 1004;
+  test('getRollDistribution returns array of result groups', async function () {
+    const setId = 4;
     await insertRoll(setId, 20, 1);
     await insertRoll(setId, 20, 1);
     await insertRoll(setId, 20, 20);
     const result = await getRollDistribution(setId);
     expect(Array.isArray(result)).toBe(true);
     // Check that we have the expected results (1 and 20)
-    const results = result.map(r => r.result).sort((a, b) => a - b);
+    const results = result.map(function (r) {
+      return r.result;
+    }).sort(function (a, b) {
+      return a - b;
+    });
     expect(results).toEqual([1, 20]);
   });
 
-  test('getRollDistribution handles empty results', async () => {
+  test('getRollDistribution handles empty results', async function () {
     const result = await getRollDistribution(9999);
     expect(result).toEqual([]);
   });
