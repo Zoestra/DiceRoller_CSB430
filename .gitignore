@@ -45,3 +45,6 @@ app-example
 # other
 /.agent-info
 
+# test coverage reports
+/coverage
+
