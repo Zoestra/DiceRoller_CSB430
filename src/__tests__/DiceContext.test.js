@@ -49,19 +49,24 @@ describe('DiceContext', function () {
     __restoreOpenDatabaseForTests();
   });
 
-  test('useDiceContext throws outside provider', function () {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(function () {});
+  test('useDiceContext returns safe fallback outside provider', function () {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(function () {});
+    let latestContext = null;
 
     function BareConsumer() {
-      useDiceContext();
+      latestContext = useDiceContext();
       return null;
     }
 
-    expect(function renderBareConsumer() {
-      render(<BareConsumer />);
-    }).toThrow('useDiceContext must be used within a DiceProvider');
+    render(<BareConsumer />);
 
-    errorSpy.mockRestore();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(latestContext).not.toBeNull();
+    expect(latestContext.points).toBe(DEFAULT_POINTS);
+    expect(latestContext.equippedSetId).toBe(1);
+    expect(latestContext.activeDieType).toBe(20);
+
+    warnSpy.mockRestore();
   });
 
   test('loads seeded database state on mount', async function () {

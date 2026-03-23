@@ -13,6 +13,15 @@ import { getDB } from './db.js';
 export const DEFAULT_POINTS = 0;
 
 /**
+ * @typedef {Object} UserStateRow
+ * @property {number} id - Row ID (always 1)
+ * @property {number} points - Player points
+ * @property {number|null} active_set_id - Active dice set ID
+ * @property {string} created_at - ISO timestamp
+ * @property {string} updated_at - ISO timestamp
+ */
+
+/**
  * Get current user points
  * @returns {Promise<number>}
  */
@@ -47,9 +56,10 @@ export async function addPoints(amount) {
 }
 
 /**
- * Deduct points from current balance
- * @param {number} amount - Points to deduct
- * @returns {Promise<boolean>} - True if successful, false if insufficient points
+ * Deduct points from current balance.
+ * Fails gracefully if insufficient points available.
+ * @param {number} amount - Points to deduct (must be positive)
+ * @returns {Promise<boolean>} - True if deduction successful, false if insufficient points
  */
 export async function deductPoints(amount) {
   const currentPoints = await getPoints();
@@ -71,8 +81,10 @@ export async function getActiveSetId() {
 }
 
 /**
- * Set active dice set ID
- * @param {number|null} setId - Dice set ID to set as active
+ * Set active dice set ID.
+ * Pass null to clear the active set.
+ * @param {number|null} setId - Dice set ID to set as active, or null to clear
+ * @returns {Promise<void>}
  */
 export async function setActiveSetId(setId) {
   const database = await getDB();

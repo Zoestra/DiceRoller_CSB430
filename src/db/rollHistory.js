@@ -11,10 +11,43 @@
 import { getDB } from './db.js';
 
 /**
- * Insert a roll into history
- * @param {number} setId - Dice set ID
- * @param {number} dieType - Type of die (e.g., 20)
- * @param {number} result - Final result
+ * @typedef {Object} RollHistoryRow
+ * @property {number} id - Roll ID (auto-increment)
+ * @property {number} set_id - Dice set ID
+ * @property {number} die_type - Die type (4, 6, 8, 10, 12, or 20)
+ * @property {number} result - Roll result (1 to die_type)
+ * @property {string} rolled_at - ISO timestamp of roll
+ */
+
+/**
+ * @typedef {Object} DiceSetStats
+ * @property {number} total_rolls - Total number of rolls
+ * @property {number} average - Average roll value
+ * @property {number} min_roll - Minimum roll value
+ * @property {number} max_roll - Maximum roll value
+ * @property {number} max_rolls - Count of rolls matching die type (critical successes)
+ * @property {number} nat_1s - Count of rolls that were 1 (critical failures)
+ */
+
+/**
+ * @typedef {Object} RollDistributionEntry
+ * @property {number} result - Die face value
+ * @property {number} count - Number of times this face was rolled
+ */
+
+/**
+ * @typedef {Object} RollHistoryOptions
+ * @property {number} [setId] - Optional: filter by dice set ID
+ * @property {number} [limit=100] - Maximum results to return (default 100)
+ */
+
+/**
+ * Insert a roll into history.
+ * Auto-increments total_rolls counter via DB trigger.
+ * @param {number} setId - Dice set ID that was rolled
+ * @param {number} dieType - Type of die (4, 6, 8, 10, 12, or 20)
+ * @param {number} result - Roll result (1 to dieType inclusive)
+ * @returns {Promise<void>}
  */
 export async function insertRoll(setId, dieType, result) {
   const database = await getDB();
@@ -26,11 +59,10 @@ export async function insertRoll(setId, dieType, result) {
 }
 
 /**
- * Get roll history with optional filters
- * @param {Object} options - Filter options
- * @param {number} options.setId - Filter by dice set
- * @param {number} options.limit - Limit number of results
- * @returns {Promise<Array>}
+ * Get roll history with optional filters.
+ * Results ordered by most recent first.
+ * @param {RollHistoryOptions} [options] - Filter and limit options
+ * @returns {Promise<RollHistoryRow[]>}
  */
 export async function getRollHistory({ setId, limit = 100 } = {}) {
   const database = await getDB();
@@ -47,9 +79,10 @@ export async function getRollHistory({ setId, limit = 100 } = {}) {
 }
 
 /**
- * Get stats for a specific dice set
- * @param {number} setId - Dice set ID
- * @returns {Promise<Object>}
+ * Get aggregated stats for a specific dice set.
+ * Computes average, min, max, critical successes, and critical failures.
+ * @param {number} setId - Dice set ID to analyze
+ * @returns {Promise<DiceSetStats|null>} - Stats object or null if no rolls exist
  */
 export async function getDiceSetStats(setId) {
   const database = await getDB();
@@ -67,9 +100,10 @@ export async function getDiceSetStats(setId) {
 }
 
 /**
- * Get distribution data for histogram
- * @param {number} setId - Dice set ID
- * @returns {Promise<Array>}
+ * Get distribution breakdown for a dice set histogram.
+ * Shows count of each die face value rolled.
+ * @param {number} setId - Dice set ID to analyze
+ * @returns {Promise<RollDistributionEntry[]>} - Array of result/count pairs ordered by result value
  */
 export async function getRollDistribution(setId) {
   const database = await getDB();
