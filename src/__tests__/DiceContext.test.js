@@ -5,7 +5,7 @@
  * Uses real SQLite test harness + rendered React tree.
  *
  * ---
- * NOTE: This file was written with AI assistance (GitHub Copilot).
+ * NOTE: This file was written with AI assistance (GitHub Copilot, GPT-5.3-Codex).
  * ---
  */
 
@@ -23,6 +23,8 @@ import {
     __setOpenDatabaseForTests,
     getActiveSetId,
     getPoints,
+    setActiveSetId,
+    setPoints,
 } from '@/db/db.js';
 
 function ContextProbe({ onValue }) {
@@ -46,28 +48,21 @@ describe('DiceContext', function () {
     __restoreOpenDatabaseForTests();
   });
 
-  test('useDiceContext warns and returns fallback outside provider', function () {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(function () {});
-    let fallbackContext = null;
+  test('useDiceContext throws outside provider', function () {
+    let thrownErrorMessage = null;
 
     function BareConsumer() {
-      fallbackContext = useDiceContext();
+      useDiceContext();
       return null;
     }
 
-    expect(function renderBareConsumer() {
+    try {
       render(<BareConsumer />);
-    }).not.toThrow();
+    } catch (error) {
+      thrownErrorMessage = error.message;
+    }
 
-    expect(warnSpy).toHaveBeenCalledWith(
-      'useDiceContext called outside DiceProvider; returning fallback context.'
-    );
-    expect(fallbackContext).not.toBeNull();
-    expect(fallbackContext.equippedSetId).toBe(1);
-    expect(fallbackContext.activeDieType).toBe(20);
-    expect(typeof fallbackContext.setPointsValue).toBe('function');
-
-    warnSpy.mockRestore();
+    expect(thrownErrorMessage).toContain('useDiceContext must be used within a DiceProvider');
   });
 
   test('loads seeded database state on mount', async function () {
@@ -177,8 +172,9 @@ describe('DiceContext', function () {
     });
 
     await act(async function () {
-      await latestContext.setPointsValue(777);
-      await latestContext.setEquippedSetId(4);
+      await setPoints(777);
+      await setActiveSetId(4);
+      await latestContext.refresh();
     });
 
     await waitFor(function () {
