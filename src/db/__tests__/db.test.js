@@ -32,9 +32,7 @@ import {
 beforeEach(async function () {
   await createFreshTestDatabase();
   __setOpenDatabaseForTests(getOpenDatabaseAsyncForTests());
-  __resetDbForTests();
 });
-
 afterEach(async function () {
   await teardownTestDatabase();
 });
