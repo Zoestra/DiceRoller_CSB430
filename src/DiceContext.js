@@ -14,11 +14,12 @@ import { getActiveSetId, getPoints, setActiveSetId, setPoints } from '@/db/db.js
 
 const DiceContext = createContext(null);
 
+const DEFAULT_EQUIPPED_SET_ID = 1;
 const DEFAULT_ACTIVE_DIE_TYPE = 20;
 
 export function DiceProvider({ children }) {
   const [points, setPointsState] = useState(null);
-  const [equippedSetId, setEquippedSetIdState] = useState(null);
+  const [equippedSetId, setEquippedSetIdState] = useState(DEFAULT_EQUIPPED_SET_ID);
   const [activeDieType, setActiveDieTypeState] = useState(DEFAULT_ACTIVE_DIE_TYPE);
 
   useEffect(function initializeContext() {
@@ -28,9 +29,10 @@ export function DiceProvider({ children }) {
   async function refreshStateFromDatabase() {
     const loadedPoints = await getPoints();
     const loadedSetId = await getActiveSetId();
+    const normalizedSetId = loadedSetId ?? DEFAULT_EQUIPPED_SET_ID;
 
     setPointsState(loadedPoints);
-    setEquippedSetIdState(loadedSetId);
+    setEquippedSetIdState(normalizedSetId);
   }
 
   async function setPointsValue(value) {
@@ -39,7 +41,8 @@ export function DiceProvider({ children }) {
   }
 
   async function setEquippedSetId(setId) {
-    await setActiveSetId(setId);
+    const normalizedSetId = setId ?? DEFAULT_EQUIPPED_SET_ID;
+    await setActiveSetId(normalizedSetId);
     await refreshStateFromDatabase();
   }
 
@@ -63,7 +66,16 @@ export function DiceProvider({ children }) {
 export function useDiceContext() {
   const context = useContext(DiceContext);
   if (!context) {
-    throw new Error('useDiceContext must be used inside DiceProvider');
+    console.warn('useDiceContext called outside DiceProvider; returning fallback context.');
+    return {
+      points: null,
+      equippedSetId: DEFAULT_EQUIPPED_SET_ID,
+      activeDieType: DEFAULT_ACTIVE_DIE_TYPE,
+      refresh: async function () {},
+      setPointsValue: async function () {},
+      setEquippedSetId: async function () {},
+      setActiveDieType: function () {},
+    };
   }
   return context;
 }
