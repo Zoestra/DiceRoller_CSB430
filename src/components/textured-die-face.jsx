@@ -12,6 +12,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Svg, { ClipPath, Defs, G, Image, Path, Pattern, Rect, Text as SvgText } from 'react-native-svg';
+import { useColorScheme } from '../hooks/use-color-scheme.js';
+import { useThemeColor } from '../hooks/use-theme-color.js';
 
 import { getSkinBySetId } from '@/db/skins';
 
@@ -145,6 +147,9 @@ export default function TexturedDieFace({
   const [error, setError] = useState(null);
   const svgIdPrefixRef = useRef(`die-${Math.random().toString(36).slice(2, 10)}`);
 
+  const colorScheme = useColorScheme();
+  const labelColor = useThemeColor({}, 'text');
+
   useEffect(
     function loadSkinEffect() {
       async function loadSkin() {
@@ -210,6 +215,7 @@ export default function TexturedDieFace({
         ? String(resultValue)
         : '?';
   const resolvedLabelFontSize = labelFontSize ?? getLabelFontSize(dieType);
+  const haloFill = colorScheme === 'dark' ? '#000000' : '#FFFFFF';
 
   return (
     <Svg width={size} height={size} viewBox="0 0 50 50">
@@ -285,7 +291,7 @@ export default function TexturedDieFace({
             textAnchor="middle"
             fontSize={resolvedLabelFontSize + 0.35}
             fontWeight="900"
-            fill="#FFFFFF"
+            fill={haloFill}
             fillOpacity={0.72}>
             {displayValue}
           </SvgText>
@@ -296,7 +302,7 @@ export default function TexturedDieFace({
             textAnchor="middle"
             fontSize={resolvedLabelFontSize}
             fontWeight="900"
-            fill={skinData.edgeColor}>
+            fill={labelColor}>
             {displayValue}
           </SvgText>
         </>

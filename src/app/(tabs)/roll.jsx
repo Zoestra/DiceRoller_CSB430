@@ -12,6 +12,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { useThemeColor } from '../../hooks/use-theme-color.js';
 
 import { useDiceContext } from '../../DiceContext.js';
 import { DiceTray } from '../../components/dice-tray.jsx';
@@ -54,6 +55,9 @@ export default function RollScreen() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const d100FaceLabels = getD100FaceLabels(lastResult);
+  const bg = useThemeColor({}, 'background');
+  const iconColor = useThemeColor({}, 'icon');
+  const textColor = useThemeColor({}, 'text');
 
   useEffect(
     function loadSetNameEffect() {
@@ -120,16 +124,16 @@ export default function RollScreen() {
   }
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: bg, borderColor: textColor }] }>
       <View style={styles.topBar}>
         <Pressable style={styles.squareButton} onPress={handleBackPress}>
-          <MaterialCommunityIcons name="arrow-left" size={20} color="#111" />
+          <MaterialCommunityIcons name="arrow-left" size={20} color={iconColor} />
         </Pressable>
         <View style={styles.titleBox}>
           <ThemedText style={styles.titleText}>{setName}</ThemedText>
         </View>
         <Pressable style={styles.smallSquareButton} onPress={handleSettingsPress}>
-          <MaterialCommunityIcons name="cog-outline" size={20} color="#111" />
+          <MaterialCommunityIcons name="cog-outline" size={20} color={iconColor} />
         </Pressable>
       </View>
 
@@ -161,7 +165,7 @@ export default function RollScreen() {
             size={240}
           />
         )}
-        <ThemedText style={styles.pointsText}>{`Points: ${points}`}</ThemedText>
+        <ThemedText style={[styles.pointsText, { color: textColor }]}>{`Points: ${points}`}</ThemedText>
         {errorMessage.length > 0 ? <ThemedText style={styles.errorText}>{errorMessage}</ThemedText> : null}
       </View>
 
@@ -176,13 +180,13 @@ export default function RollScreen() {
           {isRolling ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <ThemedText style={styles.rollButtonText}>ROLL DICE</ThemedText>
+            <ThemedText style={[styles.rollButtonText, { color: bg } ]}>ROLL DICE</ThemedText>
           )}
         </Pressable>
 
         <Pressable style={styles.statsButton} onPress={handleStatsPress}>
-          <MaterialCommunityIcons name="chart-bar" size={20} color="#111" />
-          <ThemedText style={styles.statsButtonText}>STATS</ThemedText>
+          <MaterialCommunityIcons name="chart-bar" size={20} color={iconColor} />
+          <ThemedText style={[styles.statsButtonText, { color: textColor }]}>STATS</ThemedText>
         </Pressable>
       </View>
     </View>

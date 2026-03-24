@@ -9,6 +9,7 @@
  */
 
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useThemeColor } from '../hooks/use-theme-color.js';
 
 import Svg, { G, Path } from 'react-native-svg';
 import TexturedDieFace, { DIE_GEOMETRY } from './textured-die-face.jsx';
@@ -24,8 +25,11 @@ const DIE_TYPES = [4, 6, 8, 10, 12, 20, 100];
  * }} props
  */
 export function DiceTray({ activeDieType, onSelectDieType, setId = 1, style }) {
+  const bg = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, { backgroundColor: bg, borderColor: textColor }, style]}>
       <View style={styles.row}>
         {DIE_TYPES.map(function (dieType) {
           const isActive = dieType === activeDieType;
@@ -54,7 +58,7 @@ export function DiceTray({ activeDieType, onSelectDieType, setId = 1, style }) {
                     <G transform={DIE_GEOMETRY[dieType]?.groupTransform || undefined}>
                       <Path
                         d={DIE_GEOMETRY[dieType]?.outline?.d}
-                        stroke="#222"
+                        stroke={textColor}
                         strokeWidth={1.7}
                         fill="none"
                         opacity={0.8}

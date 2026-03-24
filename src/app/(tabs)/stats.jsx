@@ -12,6 +12,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
+import { useSettings } from '../../context/SettingsContext.jsx';
+import { useColorScheme } from '../../hooks/use-color-scheme.js';
+import { useThemeColor } from '../../hooks/use-theme-color.js';
 
 import { useDiceContext } from '../../DiceContext.js';
 import { DiceTray } from '../../components/dice-tray.jsx';
@@ -93,6 +96,11 @@ function buildD100ChartData(distribution) {
 
 export default function StatsScreen() {
   const { activeDieType, equippedSetId, setActiveDieType } = useDiceContext();
+  const colorScheme = useColorScheme();
+  const settings = useSettings();
+  const selectedTheme = settings?.theme ?? colorScheme;
+  const bg = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [stats, setStats] = useState(createEmptyStats());
@@ -183,6 +191,38 @@ export default function StatsScreen() {
 
   const resolvedChartWidth = activeDieType === 20 ? CHART_WIDTH - 12 : CHART_WIDTH;
 
+  // Derive RGBA colors from the resolved theme text color for chart rendering.
+  // Supports hex (#rgb, #rrggbb), `rgb(...)`, and `rgba(...)` strings.
+  function hexToRgba(hex, opacity = 1) {
+    let h = String(hex).replace('#', '');
+    if (h.length === 3) {
+      h = h.split('').map(function (ch) {
+        return ch + ch;
+      }).join('');
+    }
+    const bigint = parseInt(h, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r},${g},${b},${opacity})`;
+  }
+
+  function resolveChartColor(opacity = 1) {
+    if (typeof textColor === 'string') {
+      if (textColor.startsWith('#')) {
+        return hexToRgba(textColor, opacity);
+      }
+      if (textColor.startsWith('rgba')) {
+        // replace existing alpha with requested opacity
+        return textColor.replace(/rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/, `rgba($1,$2,$3,${opacity})`);
+      }
+      if (textColor.startsWith('rgb')) {
+        return textColor.replace('rgb(', 'rgba(').replace(')', `,${opacity})`);
+      }
+    }
+    return selectedTheme === 'dark' ? `rgba(236,238,238,${opacity})` : `rgba(17,17,17,${opacity})`;
+  }
+
   const displayLabels = useMemo(
     function displayLabelsMemo() {
       if (activeDieType !== 20) {
@@ -209,17 +249,17 @@ export default function StatsScreen() {
     : chartData.data;
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.headerBox}>
-        <ThemedText style={styles.headerText}>{setName.toUpperCase()}</ThemedText>
+    <View style={[styles.screen, { backgroundColor: bg, borderColor: textColor }] }>
+      <View style={[styles.headerBox, { backgroundColor: bg, borderColor: textColor }] }>
+        <ThemedText style={[styles.headerText, { color: textColor }]}>{setName.toUpperCase()}</ThemedText>
       </View>
 
       <View style={styles.contentArea}>
-        <View style={styles.dieCard}>
+        <View style={[styles.dieCard, { backgroundColor: bg, borderColor: textColor }]}>
           <TexturedDieFace setId={selectedSetId} dieType={activeDieType} size={78} hideLabel />
         </View>
 
-        <View style={styles.chartCard}>
+        <View style={[styles.chartCard, { backgroundColor: bg, borderColor: textColor }]}> 
           <View style={styles.chartWrapper}>
             <BarChart
               data={{
@@ -239,21 +279,21 @@ export default function StatsScreen() {
               yAxisLabel=""
               yAxisSuffix=""
               chartConfig={{
-                backgroundColor: '#ffffff',
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
+                backgroundColor: bg,
+                backgroundGradientFrom: bg,
+                backgroundGradientTo: bg,
                 decimalPlaces: 0,
                 color: function chartColor(opacity = 1) {
-                  return `rgba(17, 17, 17, ${opacity})`;
+                  return resolveChartColor(opacity);
                 },
                 labelColor: function labelColor(opacity = 1) {
-                  return `rgba(17, 17, 17, ${opacity})`;
+                  return resolveChartColor(opacity);
                 },
                 barPercentage: activeDieType === 20 ? 0.46 : activeDieType === 100 ? 0.64 : 0.75,
-                fillShadowGradient: '#111111',
+                fillShadowGradient: typeof textColor === 'string' && textColor.startsWith('#') ? textColor : (selectedTheme === 'dark' ? '#ECEDEE' : '#111111'),
                 fillShadowGradientOpacity: hasHistory ? 1 : 0.18,
                 propsForBackgroundLines: {
-                  stroke: '#d0d0d0',
+                  stroke: selectedTheme === 'dark' ? '#2a2a2a' : '#d0d0d0',
                   strokeWidth: 1,
                 },
                 propsForLabels: {
@@ -271,17 +311,17 @@ export default function StatsScreen() {
           </View>
 
           <View style={styles.summaryRow}>
-            <View style={styles.summaryCard}>
-              <ThemedText style={styles.summaryLabel}>Rolls</ThemedText>
-              <ThemedText style={styles.summaryValue}>{stats.total_rolls ?? 0}</ThemedText>
+            <View style={[styles.summaryCard, { backgroundColor: selectedTheme === 'dark' ? '#222' : '#f3f3f3', borderColor: textColor }]}>
+              <ThemedText style={[styles.summaryLabel, { color: textColor }]}>Rolls</ThemedText>
+              <ThemedText style={[styles.summaryValue, { color: textColor }]}>{stats.total_rolls ?? 0}</ThemedText>
             </View>
-            <View style={styles.summaryCard}>
-              <ThemedText style={styles.summaryLabel}>Average</ThemedText>
-              <ThemedText style={styles.summaryValue}>{formatAverage(stats.average)}</ThemedText>
+            <View style={[styles.summaryCard, { backgroundColor: selectedTheme === 'dark' ? '#222' : '#f3f3f3', borderColor: textColor }]}>
+              <ThemedText style={[styles.summaryLabel, { color: textColor }]}>Average</ThemedText>
+              <ThemedText style={[styles.summaryValue, { color: textColor }]}>{formatAverage(stats.average)}</ThemedText>
             </View>
           </View>
 
-          {isLoading ? <ThemedText style={styles.statusText}>Loading stats...</ThemedText> : null}
+          {isLoading ? <ThemedText style={[styles.statusText, { color: textColor }]}>Loading stats...</ThemedText> : null}
           {!isLoading && errorMessage.length > 0 ? (
             <ThemedText style={styles.errorText}>{errorMessage}</ThemedText>
           ) : null}
