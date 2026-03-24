@@ -1,26 +1,38 @@
-import { View, Text, Switch, Button } from 'react-native';
+import { Switch, Button, StyleSheet } from 'react-native';
+import { ThemedView } from '@/components/themed-view';
+import { ThemedText } from '@/components/themed-text';
 import { useSettings } from '@/context/SettingsContext';
 
 export default function SettingsScreen() {
   const { theme, textSize, updateTheme, updateTextSize } = useSettings();
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: textSize }}>Settings</Text>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title">Settings</ThemedText>
 
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ fontSize: textSize }}>Dark Mode</Text>
+      <ThemedView style={styles.section}>
+        <ThemedText>Dark Mode</ThemedText>
         <Switch
           value={theme === 'dark'}
           onValueChange={(value) => updateTheme(value ? 'dark' : 'light')}
         />
-      </View>
+      </ThemedView>
 
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ fontSize: textSize }}>Text Size: {textSize}</Text>
+      <ThemedView style={styles.section}>
+        <ThemedText>Text Size: {textSize}</ThemedText>
         <Button title="Increase" onPress={() => updateTextSize(textSize + 1)} />
         <Button title="Decrease" onPress={() => updateTextSize(textSize - 1)} />
-      </View>
-    </View>
+      </ThemedView>
+    </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  section: {
+    marginTop: 20,
+  },
+});
