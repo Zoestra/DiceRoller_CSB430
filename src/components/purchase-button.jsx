@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { getPoints, deductPoints } from '@/db/userState';
-import { getDB } from '@/db/db';
+import { getPoints, deductPoints } from '../db/userState';
+import { getDB } from '../db/db';
 
 export default function PurchaseButton({ setId, price, owned, onPurchaseSuccess }) {
   const [userPoints, setUserPoints] = useState(null);
