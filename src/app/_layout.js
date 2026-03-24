@@ -5,8 +5,7 @@ import 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { DiceProvider } from '../DiceContext.js';
-import { SettingsProvider } from '../context/SettingsContext.jsx';
-import { useSettings } from '../context/SettingsContext.jsx';
+import { SettingsProvider, useSettings } from '../context/SettingsContext.jsx';
 
 export const unstable_settings = {
   anchor: '(tabs)',
