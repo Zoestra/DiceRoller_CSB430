@@ -21,6 +21,7 @@ import { Asset } from 'expo-asset';
 import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
+export { getBetrayerTurnAfter } from './diceSets.js';
 export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
 export { addPoints, deductPoints, DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
 
