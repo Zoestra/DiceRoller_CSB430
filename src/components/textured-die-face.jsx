@@ -30,7 +30,7 @@ const SKIN_ASSETS = {
   },
 };
 
-const DIE_GEOMETRY = {
+export const DIE_GEOMETRY = {
   4: {
     groupTransform: 'translate(-59.996948,-1.8433758)',
     outline: {

@@ -1,7 +1,7 @@
 /**
  * Dice tray selector component.
  *
- * Renders selectable die types in a horizontal tray and excludes the active die.
+ * Renders selectable die types in a horizontal tray and highlights the active die.
  *
  * ---
  * NOTE: This file was written with AI assistance (GitHub Copilot, GPT-5.3-Codex).
@@ -11,7 +11,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import TexturedDieFace from './textured-die-face.jsx';
-import { ThemedText } from './themed-text';
+import Svg, { G, Path } from 'react-native-svg';
+import { DIE_GEOMETRY } from './textured-die-face.jsx';
 
 const DIE_TYPES = [4, 6, 8, 10, 12, 20, 100];
 
@@ -24,44 +25,63 @@ const DIE_TYPES = [4, 6, 8, 10, 12, 20, 100];
  * }} props
  */
 export function DiceTray({ activeDieType, onSelectDieType, setId = 1, style }) {
-  const availableDieTypes = DIE_TYPES.filter(function (dieType) {
-    return dieType !== activeDieType;
-  });
-
   return (
     <View style={[styles.container, style]}>
       <View style={styles.row}>
-        {availableDieTypes.map(function (dieType) {
+        {DIE_TYPES.map(function (dieType) {
+          const isActive = dieType === activeDieType;
+          const singleDieSize = isActive ? 42 : 28;
+          const d100DieSize = isActive ? 32 : 22;
+
           return (
             <Pressable
               key={`die-${dieType}`}
               accessibilityRole="button"
               accessibilityLabel={`Select d${dieType}`}
-              style={styles.dieButton}
+              style={[styles.dieButton, isActive ? styles.dieButtonActive : null]}
               onPress={function handlePress() {
                 onSelectDieType(dieType);
               }}>
-              <View style={styles.diePreviewFrame}>
+              <View style={[styles.diePreviewFrame, isActive ? styles.diePreviewFrameActive : null]}>
+                {isActive ? (
+                  <Svg
+                    viewBox="0 0 50 50"
+                    width="100%"
+                    height="100%"
+                    style={[styles.activeDieSvgOutline, { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }]}
+                    preserveAspectRatio="xMidYMid meet"
+                    pointerEvents="none"
+                  >
+                    <G transform={DIE_GEOMETRY[dieType]?.groupTransform || undefined}>
+                      <Path
+                        d={DIE_GEOMETRY[dieType]?.outline?.d}
+                        stroke="#222"
+                        strokeWidth={1.7}
+                        fill="none"
+                        opacity={0.8}
+                      />
+                    </G>
+                  </Svg>
+                ) : null}
                 {dieType === 100 ? (
-                  <View style={styles.d100Preview}>
-                    <View style={styles.d100RightDie}>
-                      <TexturedDieFace setId={setId} dieType={10} size={24} hideLabel />
+                  <View style={[styles.d100Preview, isActive ? styles.d100PreviewActive : null]}>
+                    <View style={[styles.d100RightDie, isActive ? styles.d100RightDieActive : null]}>
+                      <TexturedDieFace setId={setId} dieType={10} size={d100DieSize} hideLabel />
                     </View>
-                    <View style={styles.d100LeftDie}>
+                    <View style={[styles.d100LeftDie, isActive ? styles.d100LeftDieActive : null]}>
                       <TexturedDieFace
                         setId={setId}
                         dieType={10}
-                        size={24}
+                        size={d100DieSize}
                         hideLabel
                         backgroundFill="#fff"
                       />
                     </View>
                   </View>
                 ) : (
-                  <TexturedDieFace setId={setId} dieType={dieType} size={30} hideLabel />
+                  <TexturedDieFace setId={setId} dieType={dieType} size={singleDieSize} hideLabel />
                 )}
               </View>
-              <ThemedText style={styles.dieLabel}>{dieType}</ThemedText>
             </Pressable>
           );
         })}
@@ -87,34 +107,50 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   dieButton: {
-    width: 40,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  diePreviewFrame: {
-    width: 34,
-    height: 30,
+    width: 36,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  d100Preview: {
-    width: 34,
+  dieButtonActive: {
+    width: 56,
+  },
+  diePreviewFrame: {
+    width: 32,
     height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  diePreviewFrameActive: {
+    width: 48,
+    height: 42,
+  },
+  activeDieSvgOutline: {
+    zIndex: 0,
+  },
+  d100Preview: {
+    width: 30,
+    height: 24,
+  },
+  d100PreviewActive: {
+    width: 42,
+    height: 35,
   },
   d100RightDie: {
     position: 'absolute',
     right: 0,
     top: 0,
   },
+  d100RightDieActive: {
+    top: 0,
+  },
   d100LeftDie: {
     position: 'absolute',
     left: 0,
-    top: 4,
+    top: 3,
   },
-  dieLabel: {
-    marginTop: 3,
-    fontSize: 10,
-    fontWeight: '900',
-    color: '#111',
+  d100LeftDieActive: {
+    top: 7,
   },
 });
