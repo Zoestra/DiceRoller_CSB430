@@ -1,50 +1,88 @@
-# Welcome to your Expo app 👋
+# Superstitious Dice Roller
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An Expo React Native app that implements attitude-based, weighted dice rolls with a local points economy and persistent roll history.
 
-## Get started
+This repository is the codebase for the CSB430 assignment. Key source files:
 
-1. Install dependencies
+- Core logic: [src/diceLogic.js](src/diceLogic.js)
+- Roll pipeline: [src/rollLogic.js](src/rollLogic.js)
+- Global state/provider: [src/DiceContext.js](src/DiceContext.js)
+- Database layer: [src/db/db.js](src/db/db.js)
+- Tests: [src/__tests__](src/__tests__)
 
-   ```bash
-   npm install
-   ```
+Table of contents
+- Project overview
+- Quick start
+- Key features
+- High-level architecture
+- Demo walkthrough (core flow)
+- Testing & CI
+- Development notes and recommendations
+- Contributing
 
-2. Start the app
+## Project overview
 
-   ```bash
-   npx expo start
-   ```
+This app simulates dice rolling where each dice set has an "attitude" that biases results (Lucky, Cursed, Chaotic, Mid, Balanced, or Betrayer). Users earn points based on roll results, collect and equip dice sets/skins, and view statistics derived from a persistent roll history stored in SQLite.
 
-In the output, you'll find options to open the app in a
+Problem statement: provide a reproducible, testable, and maintainable client-side dice roller that separates presentation, business logic, and persistence while supporting cross-platform development (iOS/Android/Web via Expo).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Quick start
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Install dependencies and start the development server:
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Run the unit test suite:
 
-## Learn more
+```bash
+npm test
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Run the linter:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm run lint
+```
 
-## Join the community
+## Key features
 
-Join our community of developers creating universal apps.
+- Attitude-weighted dice logic and percentile (d100) support ([src/diceLogic.js](src/diceLogic.js)).
+- Atomic roll pipeline: resolve set config → weighted roll → persist roll + award points inside a DB transaction ([src/rollLogic.js](src/rollLogic.js)).
+- Global application state via `DiceProvider` (points, equipped set, active die) ([src/DiceContext.js](src/DiceContext.js)).
+- Local persistence with SQLite and runtime schema bootstrap from `src/db/init-db.sql` ([src/db/db.js](src/db/db.js)).
+- Unit and integration tests using Jest and `@testing-library/react-native` (see [src/__tests__](src/__tests__)).
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## High-level architecture
+
+- View: Expo + React Native screens and components under `src/app/` and `src/components/`.
+- Controller: `DiceProvider` in [src/DiceContext.js](src/DiceContext.js) exposes state and mutation helpers to UI.
+- Model: `src/db/` query modules and `src/diceLogic.js` implement business logic and persistence.
+
+The database module (`src/db/db.js`) re-exports domain query modules (userState, rollHistory, diceSets, skins, achievements) and manages schema initialization and a cached DB connection.
+
+## Demo walkthrough — core flow
+
+1. Open the app and go to the Roll screen (`src/app/(tabs)/roll.jsx`).
+2. Choose a dice set and die type, then tap the roll button.
+3. The UI invokes `rollLogic.rollDie({ setId, dieType })` which:
+   - Loads set config from the DB (attitude, betrayer threshold, roll count).
+   - Resolves effective attitude (handles `Betrayer` → Lucky/Cursed based on turn threshold).
+   - Computes a weighted result via `getWeightedResult` or `getD100Result`.
+   - Persists the roll (`insertRoll`) and updates points (`addPoints`) inside a DB transaction.
+4. `DiceProvider` refreshes state from the DB and the UI updates points and history.
+
+## Testing & CI
+
+- Tests: Jest + `jest-expo` preset; test suites live in `src/__tests__` including `diceLogic.test.js`, `rollLogic.test.js`, and `DiceContext.test.js`.
+- DB test harness: test helpers in `src/db/__tests__/testDatabase.js` create a temporary SQLite instance seeded from `init-db.sql` and use injection helpers exported by `src/db/db.js`.
+- CI: the repo contains a CI workflow (see `.github/workflows`) that runs `npm ci`, `npm run lint`, and `npm test` on PRs and pushes. If the workflow is missing, add a GitHub Actions job that runs tests and lint.
+
+
+<!--
+  Project README for the Superstitious Dice Roller
+  NOTE: This README was created with AI assistance.
+-->
+
