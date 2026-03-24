@@ -6,9 +6,21 @@ module.exports = defineConfig([
   expoConfig,
   {
     ignores: ['dist/*'],
+    settings: {
+      'import/resolver': {
+        alias: {
+          map: [['@', './src']],
+          extensions: ['.js', '.jsx'],
+        },
+      },
+    },
+    rules: {
+      eqeqeq: ['error', 'always'],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+    },
   },
   {
-    files: ['**/__tests__/**/*', '**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
+    files: ['**/__tests__/**/*', '**/*.test.js'],
     languageOptions: {
       globals: {
         jest: 'readonly',

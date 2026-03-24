@@ -75,7 +75,6 @@ export function DiceProvider({ children }) {
   }
 
   /** @type {DiceContextValue} */
-  /** @type {DiceContextValue} */
   const contextValue = {
     points,
     equippedSetId,
@@ -91,12 +90,20 @@ export function DiceProvider({ children }) {
 
 /**
  * @returns {DiceContextValue}
- * @throws {Error} If called outside DiceProvider
  */
 export function useDiceContext() {
   const context = useContext(DiceContext);
   if (context === null) {
-    throw new Error('useDiceContext must be called within a DiceProvider');
+    console.warn('useDiceContext called outside DiceProvider. Returning safe defaults.');
+    return {
+      points: DEFAULT_POINTS,
+      equippedSetId: DEFAULT_EQUIPPED_SET_ID,
+      activeDieType: DEFAULT_ACTIVE_DIE_TYPE,
+      refresh: async function refreshNoop() {},
+      setPointsValue: async function setPointsNoop() {},
+      setEquippedSetId: async function setEquippedSetNoop() {},
+      setActiveDieType: function setActiveDieTypeNoop() {},
+    };
   }
   return context;
 }

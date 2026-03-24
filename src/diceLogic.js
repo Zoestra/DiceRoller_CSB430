@@ -1,6 +1,4 @@
 /**
- *
- *
  * Weighted Dice Logic
  *
  * Defines attitude-specific roll weighting and returns biased results.
@@ -11,6 +9,12 @@
  */
 
 const SUPPORTED_DIE_TYPES = [4, 6, 8, 10, 12, 20];
+
+/**
+ * @typedef {Object} WeightedRollOptions
+ * @property {number} [rollCount]
+ * @property {number} [betrayerTurnAfter]
+ */
 
 function createFaceList(dieType) {
   return Array.from({ length: dieType }, function (_, index) {
@@ -27,23 +31,23 @@ function randomFromValues(values) {
   return values[randomIndex];
 }
 
-function randomFromTables(weightedTables) {
-  const totalWeight = weightedTables.reduce(function (sum, table) {
-    return sum + table.weight;
+function randomFromBuckets(weightedBuckets) {
+  const totalWeight = weightedBuckets.reduce(function (sum, bucket) {
+    return sum + bucket.weight;
   }, 0);
   let target = Math.random() * totalWeight;
 
-  for (const table of weightedTables) {
-    target -= table.weight;
+  for (const bucket of weightedBuckets) {
+    target -= bucket.weight;
     if (target <= 0) {
-      return randomFromValues(table.values);
+      return randomFromValues(bucket.values);
     }
   }
 
-  return randomFromValues(weightedTables[weightedTables.length - 1].values);
+  return randomFromValues(weightedBuckets[weightedBuckets.length - 1].values);
 }
 
-function getLuckyTables(dieType) {
+function getLuckyBuckets(dieType) {
   const threshold = Math.ceil(dieType * 0.6);
   const high = [];
   const low = [];
