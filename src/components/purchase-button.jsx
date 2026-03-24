@@ -3,22 +3,8 @@ import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-nat
 import { getPoints, deductPoints } from '@/db/userState';
 import { getDB } from '@/db/db';
 
-export default function PurchaseButton({ setId, price, owned, onPurchaseSuccess }) {
-  const [userPoints, setUserPoints] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function PurchaseButton({ setId, price, owned, userPoints, onPurchaseSuccess }) {
   const [purchasing, setPurchasing] = useState(false);
-
-  useEffect(() => {
-    async function loadPoints() {
-      try {
-        const points = await getPoints();
-        setUserPoints(points);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadPoints();
-  }, []);
 
   async function handlePurchase() {
     if (purchasing || owned) return;
@@ -34,7 +20,6 @@ export default function PurchaseButton({ setId, price, owned, onPurchaseSuccess 
           'UPDATE dice_sets SET owned = 1 WHERE id = ?',
           [setId]
         );
-        setUserPoints(prev => prev - price);
         onPurchaseSuccess?.();
       } else {
         alert('Not enough points!');
@@ -45,8 +30,6 @@ export default function PurchaseButton({ setId, price, owned, onPurchaseSuccess 
       setPurchasing(false);
     }
   }
-
-  if (loading) return <ActivityIndicator />;
 
   const canAfford = userPoints >= price;
 
