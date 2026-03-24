@@ -1,3 +1,6 @@
+
+//NOTE: This file was written with AI assistance (Claude), as well as StackOverflow
+
 import Svg, { Defs, ClipPath, Pattern, Image, Path, Rect, G } from 'react-native-svg';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
@@ -27,6 +30,12 @@ const D20_LINES = [
   "m 24.94163,2.2547786 0.039,10.3457574 19.61249,1.188732 -8.33121,18.723322",
   "M 44.71181,36.37381 36.31785,32.51259 25.01398,47.677673 13.43033,32.68047",
 ];
+
+// Center triangle needs its transform applied separately
+const D20_CENTER_TRIANGLE = {
+  d: "m 325.02378,40.215497 -12.6035,-21.555749 24.96958,-0.137073 z",
+  transform: "matrix(0.45625706,0.80018886,-0.80018886,0.45625706,-102.67002,-245.86572)",
+};
 
 export default function DiceView({ setId, size = 200 }) {
   const [skinData, setSkinData] = useState(null);
@@ -89,60 +98,67 @@ export default function DiceView({ setId, size = 200 }) {
     <Svg width={size} height={size} viewBox={`0 0 50 50`}>
       <Defs>
          {/* Clip path — constrains texture to die shape */}
-                <ClipPath id={clipId}>
-                  <Path d={D20_CLIP_PATH} />
-                </ClipPath>
+            <ClipPath id={clipId}>
+              <Path d={D20_CLIP_PATH} />
+            </ClipPath>
 
-                {/* Texture pattern */}
-                <Pattern id={patternId} patternUnits="userSpaceOnUse" x="0" y="0" width="50" height="50">
-                  <Image
-                    href={skinData.texture}
-                    x="0"
-                    y="0"
-                    width="50"
-                    height="50"
-                    preserveAspectRatio="xMidYMid slice"
-                  />
-                </Pattern>
-
-              </Defs>
-
-              {/* Layer 1: Texture clipped to die shape */}
-              <Rect
+            {/* Texture pattern */}
+            <Pattern id={patternId} patternUnits="userSpaceOnUse" x="0" y="0" width="50" height="50">
+              <Image
+                href={skinData.texture}
                 x="0"
                 y="0"
                 width="50"
                 height="50"
-                fill={`url(#${patternId})`}
-                clipPath={`url(#${clipId})`}
+                preserveAspectRatio="xMidYMid slice"
               />
+            </Pattern>
 
-              {/* Layer 2: Fill color overlay with transparency so texture shows through */}
-              <Path
-                d={D20_CLIP_PATH}
-                fill={skinData.fillColor}
-                fillOpacity={0.2}
-              />
+          </Defs>
 
-              {/* Layer 3: Outer die edge */}
-              <Path
-                d={D20_CLIP_PATH}
-                fill="none"
-                stroke={skinData.edgeColor}
-                strokeWidth={0.63}
-              />
+          {/* Layer 1: Texture clipped to die shape */}
+          <Rect
+            x="0"
+            y="0"
+            width="50"
+            height="50"
+            fill={`url(#${patternId})`}
+            clipPath={`url(#${clipId})`}
+          />
 
-              {/* Layer 4: Inner lines */}
-              {D20_LINES.map((d, i) => (
-                <Path
-                  key={i}
-                  d={d}
-                  fill="none"
-                  stroke={skinData.edgeColor}
-                  strokeWidth={0.63}
-                />
-              ))}
+          {/* Layer 2: Fill color overlay with transparency so texture shows through */}
+          <Path
+            d={D20_CLIP_PATH}
+            fill={skinData.fillColor}
+            fillOpacity={0.2}
+          />
 
+          {/* Layer 3: Outer die edge */}
+          <Path
+            d={D20_CLIP_PATH}
+            fill="none"
+            stroke={skinData.edgeColor}
+            strokeWidth={0.63}
+          />
+
+          {/* Layer 4: Inner lines */}
+          {D20_LINES.map((d, i) => (
+            <Path
+              key={i}
+              d={d}
+              fill="none"
+              stroke={skinData.edgeColor}
+              strokeWidth={0.63}
+            />
+          ))}
+          {/* Layer 5: Center triangle (requires transform) */}
+          <Path
+            d={D20_CENTER_TRIANGLE.d}
+            fill="none"
+            stroke={skinData.edgeColor}
+            strokeWidth={0.63}
+            transform={D20_CENTER_TRIANGLE.transform}
+          />
     </Svg>
   );
 }
