@@ -48,3 +48,6 @@ app-example
 # test coverage reports
 /coverage
 
+# local SQLite database
+diceRoller.db
+
