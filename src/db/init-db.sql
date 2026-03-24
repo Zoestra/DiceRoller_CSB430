@@ -95,10 +95,10 @@ CREATE INDEX IF NOT EXISTS idx_roll_history_result ON roll_history(result);
 -- ============================================
 INSERT OR IGNORE INTO skins (skin_name, skin_description, skin_folder)
 VALUES
-  ('Classic', 'Default skin', 'classic'),
+  ('Classic', 'Default skin', 'dark-wood'),
   ('Golden', 'Shiny gold appearance', 'golden'),
-  ('Obsidian', 'Dark and mysterious', 'obsidian'),
-  ('Crystal', 'Translucent gemstone look', 'crystal');
+  ('Obsidian', 'Dark and mysterious', 'rock'),
+  ('Crystal', 'Translucent gemstone look', 'diamond');
 
 -- ============================================
 -- SEED DATA

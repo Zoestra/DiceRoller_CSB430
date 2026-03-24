@@ -1,14 +1,6 @@
-import {
-  __restoreOpenDatabaseForTests,
-  __setOpenDatabaseForTests,
-  getSkinByID,
-  getAllSkins,
-} from '../db.js';
-import {
-  createFreshTestDatabase,
-  getOpenDatabaseAsyncForTests,
-  teardownTestDatabase,
-} from './testDatabase.js';
+import { __restoreOpenDatabaseForTests, __setOpenDatabaseForTests } from '../db.js';
+import { getSkinBySetId, getAllSkins } from '../skins.js';
+import { createFreshTestDatabase, getOpenDatabaseAsyncForTests, teardownTestDatabase } from './testDatabase.js';
 
 beforeEach(async function () {
   await createFreshTestDatabase();
@@ -23,11 +15,13 @@ afterAll(function () {
 });
 
 describe('Dice Shop Operations', function () {
-  test('getSkinsByID returns seeded skin by ID', async function () {
-    const result = await getSkinByID(1); // Classic skin
+  test('getSkinBySetId returns seeded skin by ID', async function () {
+    const result = await getSkinBySetId(1); // Classic skin
     expect(result.skin_name).toBe('Classic');
     expect(result.skin_description).toBe('Default skin');
-    expect(result.skin_folder).toBe('classic');
+    expect(result.skin_folder).toBe('dark-wood');
+    expect(result.skin_fill_color).toBe('#e0e0e0');
+    expect(result.skin_edge_color).toBe('#000000');
   });
 
   test('getAllSkins returns an array of skins', async function () {

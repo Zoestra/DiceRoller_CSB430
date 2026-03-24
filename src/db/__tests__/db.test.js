@@ -10,19 +10,23 @@
  */
 
 import {
-  DEFAULT_POINTS,
   __restoreOpenDatabaseForTests,
   __setOpenDatabaseForTests,
+} from '../db.js';
+import {
+  DEFAULT_POINTS,
   addPoints,
   deductPoints,
   getActiveSetId,
-  getDiceSetStats,
   getPoints,
+  setPoints,
+} from '../userState.js';
+import {
+  getDiceSetStats,
+  insertRoll,
   getRollDistribution,
   getRollHistory,
-  insertRoll,
-  setPoints
-} from '../db.js';
+} from '../rollHistory.js';
 import {
   createFreshTestDatabase,
   getOpenDatabaseAsyncForTests,

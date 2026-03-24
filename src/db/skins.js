@@ -23,24 +23,10 @@ export async function getAllSkins() {
 }
 
 // Get skin by ID
-export async function getSkinByID(skinID) {
-    const database = await getDB();
-    return await database.getFirstAsync(
-        'SELECT * FROM skins WHERE id = ?',
-        skinID
-    );
-}
-
-// Add a new skin / texture combo
-export async function addNewSkin() {
-
-}
-
-// Get skin by set ID
-export async function getSkinBySetID(setID) {
-    const database = await getDB();
-    return await database.getFirstAsync(
-        'SELECT s.skin_folder, s.skin_name FROM dice_sets ds JOIN skins s ON ds.set_skin = s.id WHERE ds.id = ?',
-        setID
-    );
+export async function getSkinBySetId(setId) {
+  const database = await getDB();
+  return await database.getFirstAsync(
+    'SELECT s.skin_folder, s.skin_name, s.skin_fill_color, s.skin_edge_color, s.skin_description FROM dice_sets ds JOIN skins s ON ds.set_skin = s.id WHERE ds.id = ?',
+    setId
+  );
 }

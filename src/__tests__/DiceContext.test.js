@@ -21,12 +21,14 @@ import {
     __resetDbForTests,
     __restoreOpenDatabaseForTests,
     __setOpenDatabaseForTests,
-    DEFAULT_POINTS,
-    getActiveSetId,
-    getPoints,
-    setActiveSetId,
-    setPoints,
-} from '@/db/db.js';
+} from '../db/db.js';
+import {
+  DEFAULT_POINTS,
+  getActiveSetId,
+  getPoints,
+  setActiveSetId,
+  setPoints,
+} from '../db/userState.js';
 
 function ContextProbe({ onValue }) {
   const value = useDiceContext();
