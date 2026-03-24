@@ -87,6 +87,20 @@ CREATE TABLE IF NOT EXISTS achievements (
 );
 
 -- ============================================
+-- TABLE: user_state
+-- Single row for global user state
+-- ============================================
+CREATE TABLE IF NOT EXISTS user_state (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  points INTEGER NOT NULL DEFAULT 0,
+  total_rolls INTEGER NOT NULL DEFAULT 0,
+  active_set_id INTEGER,
+  dark_mode INTEGER NOT NULL DEFAULT 0,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (active_set_id) REFERENCES dice_sets(id)
+);
+
+-- ============================================
 -- INDEXES
 -- For query performance optimization
 -- ============================================
