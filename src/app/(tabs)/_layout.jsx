@@ -1,4 +1,4 @@
-import { getDB } from '@/db/db';
+import { getDB } from '../../db/db';
 import { Asset } from 'expo-asset';
 import { File } from 'expo-file-system/next';
 import { Tabs } from 'expo-router';
@@ -8,7 +8,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { HapticTab } from '../../components/haptic-tab';
 import { IconSymbol } from '../../components/ui/icon-symbol';
 import { Colors } from '../../constants/theme';
-import { useSettings } from '../../context/SettingsContext.jsx';
+import { useSettings } from '../../context/SettingsContext';
 
 async function initializeDatabase() {
   const db = await getDB();
