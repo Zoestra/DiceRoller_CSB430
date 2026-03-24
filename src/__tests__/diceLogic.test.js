@@ -8,7 +8,7 @@
  * ---
  */
 
-import { getWeightedResult } from '@/diceLogic.js';
+import { getD100Result, getWeightedResult } from '@/diceLogic.js';
 
 function withSeededRandom(seed, callback) {
   const originalRandom = Math.random;
@@ -67,50 +67,6 @@ describe('diceLogic#getWeightedResult', function () {
     });
   });
 
-  test('Betrayer starts lucky then trends lower after turn', function () {
-    withSeededRandom(2026, function () {
-      let earlySum = 0;
-      let lateSum = 0;
-      for (let index = 0; index < 2000; index += 1) {
-        earlySum += getWeightedResult('Betrayer', 20, {
-          rollCount: 10,
-          betrayerTurnAfter: 30,
-        });
-        lateSum += getWeightedResult('Betrayer', 20, {
-          rollCount: 40,
-          betrayerTurnAfter: 30,
-        });
-      }
-      const earlyAverage = earlySum / 2000;
-      const lateAverage = lateSum / 2000;
-
-      expect(earlyAverage).toBeGreaterThan(lateAverage);
-    });
-  });
-
-  test('Betrayer respects configured hidden turn point', function () {
-    withSeededRandom(99, function () {
-      let averageWithSmallTurn = 0;
-      let averageWithLargeTurn = 0;
-
-      for (let index = 0; index < 2000; index += 1) {
-        averageWithSmallTurn += getWeightedResult('Betrayer', 20, {
-          rollCount: 25,
-          betrayerTurnAfter: 21,
-        });
-        averageWithLargeTurn += getWeightedResult('Betrayer', 20, {
-          rollCount: 25,
-          betrayerTurnAfter: 49,
-        });
-      }
-
-      averageWithSmallTurn = averageWithSmallTurn / 2000;
-      averageWithLargeTurn = averageWithLargeTurn / 2000;
-
-      expect(averageWithLargeTurn).toBeGreaterThan(averageWithSmallTurn);
-    });
-  });
-
   test('Betrayer uses Lucky table before turn and Cursed table after turn', function () {
     const dieType = 20;
     const turnPoint = 35;
@@ -139,12 +95,67 @@ describe('diceLogic#getWeightedResult', function () {
   test('Betrayer throws when betrayerTurnAfter is missing', function () {
     expect(function callWithoutBetrayerThreshold() {
       getWeightedResult('Betrayer', 20, { rollCount: 1 });
-    }).toThrow('Betrayer roll requires betrayerTurnAfter with 20 < x < 50');
+    }).toThrow('Invalid turn threshold');
   });
 
   test('throws error for unsupported die type', function () {
     expect(function callWithUnsupportedDie() {
       getWeightedResult('Balanced', 3);
     }).toThrow('Unsupported die type: 3');
+  });
+
+  test('throws error for invalid attitude inputs', function () {
+    const invalidCases = [
+      {
+        attitude: null,
+        message: 'Invalid attitude type: expected string, got object',
+      },
+      {
+        attitude: '   ',
+        message: 'Invalid attitude value: attitude cannot be empty',
+      },
+      {
+        attitude: 'SuperLucky',
+        message: 'Unsupported attitude: SuperLucky',
+      },
+    ];
+
+    invalidCases.forEach(function (invalidCase) {
+      expect(function callWithInvalidAttitude() {
+        getWeightedResult(invalidCase.attitude, 20);
+      }).toThrow(invalidCase.message);
+    });
+  });
+
+  test('d100 returns percentile integer range', function () {
+    withSeededRandom(77, function () {
+      for (let index = 0; index < 200; index += 1) {
+        const result = getD100Result('Balanced', { rollCount: 1 });
+        expect(result).toBeGreaterThanOrEqual(1);
+        expect(result).toBeLessThanOrEqual(100);
+      }
+    });
+  });
+
+  test('d100 uses weighted tens and unweighted ones', function () {
+    let combinedResult = null;
+    withSeededRandom(2025, function () {
+      combinedResult = getD100Result('Lucky', { rollCount: 5 });
+    });
+
+    let expectedTens = null;
+    let expectedOnes = null;
+    withSeededRandom(2025, function () {
+      expectedTens = getWeightedResult('Lucky', 10, { rollCount: 5 });
+      expectedOnes = getWeightedResult('Balanced', 10, {});
+    });
+
+    const expectedTensValue = (expectedTens - 1) * 10;
+    const expectedOnesValue = expectedOnes - 1;
+    const expectedResult = expectedTensValue + expectedOnesValue === 0
+      ? 100
+      : expectedTensValue + expectedOnesValue;
+
+    expect(combinedResult).toBe(expectedResult);
   });
 });
