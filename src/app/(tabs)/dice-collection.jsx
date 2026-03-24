@@ -3,12 +3,12 @@ import { ThemedView } from '../../components/themed-view';
 import { ThemedText } from '../../components/themed-text';
 import { useDiceContext } from '../../DiceContext';
 import { useSettings } from '../../context/SettingsContext';
-import D4 from '../../assets/images/Dice_Blanks/D4.svg';
-import D6 from '../../assets/images/Dice_Blanks/D6_Blank.svg';
-import D8 from '../../assets/images/Dice_Blanks/d8.svg';
-import D10 from '../../assets/images/Dice_Blanks/d10.svg';
-import D12 from '../../assets/images/Dice_Blanks/d12.svg';
-import D20 from '../../assets/images/Dice_Blanks/d20.svg';
+import D4 from '../../../assets/images/Dice_Blanks/D4.svg';
+import D6 from '../../../assets/images/Dice_Blanks/D6_Blank.svg';
+import D8 from '../../../assets/images/Dice_Blanks/d8.svg';
+import D10 from '../../../assets/images/Dice_Blanks/d10.svg';
+import D12 from '../../../assets/images/Dice_Blanks/d12.svg';
+import D20 from '../../../assets/images/Dice_Blanks/d20.svg';
 
 const CLASSIC_DICE = [
   { dieType: 4, label: 'd4' },
