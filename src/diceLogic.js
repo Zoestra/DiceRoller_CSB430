@@ -31,23 +31,23 @@ function randomFromValues(values) {
   return values[randomIndex];
 }
 
-function randomFromBuckets(weightedBuckets) {
-  const totalWeight = weightedBuckets.reduce(function (sum, bucket) {
-    return sum + bucket.weight;
+function randomFromTables(weightedTables) {
+  const totalWeight = weightedTables.reduce(function (sum, table) {
+    return sum + table.weight;
   }, 0);
   let target = Math.random() * totalWeight;
 
-  for (const bucket of weightedBuckets) {
-    target -= bucket.weight;
+  for (const table of weightedTables) {
+    target -= table.weight;
     if (target <= 0) {
-      return randomFromValues(bucket.values);
+      return randomFromValues(table.values);
     }
   }
 
-  return randomFromValues(weightedBuckets[weightedBuckets.length - 1].values);
+  return randomFromValues(weightedTables[weightedTables.length - 1].values);
 }
 
-function getLuckyBuckets(dieType) {
+function getLuckyTables(dieType) {
   const threshold = Math.ceil(dieType * 0.6);
   const high = [];
   const low = [];
@@ -66,7 +66,7 @@ function getLuckyBuckets(dieType) {
   ];
 }
 
-function getCursedBuckets(dieType) {
+function getCursedTables(dieType) {
   const threshold = Math.floor(dieType * 0.4);
   const low = [];
   const high = [];
@@ -85,7 +85,7 @@ function getCursedBuckets(dieType) {
   ];
 }
 
-function getChaoticBuckets(dieType) {
+function getChaoticTables(dieType) {
   const middle = [];
   for (let face = 2; face <= dieType - 1; face += 1) {
     middle.push(face);
@@ -98,7 +98,7 @@ function getChaoticBuckets(dieType) {
   ];
 }
 
-function getMidBuckets(dieType) {
+function getMidTables(dieType) {
   const center = (dieType + 1) / 2;
   const nearCenter = [];
   const farFromCenter = [];
@@ -117,58 +117,80 @@ function getMidBuckets(dieType) {
   ];
 }
 
-function getBetrayerBuckets(dieType, rollCount, betrayerTurnAfter) {
-  if (rollCount <= betrayerTurnAfter) {
-    return getLuckyBuckets(dieType);
-  }
-  return getCursedBuckets(dieType);
-}
-
 function normalizeAttitude(attitude) {
   if (typeof attitude !== 'string') {
-    return 'Balanced';
+    throw new Error(`Invalid attitude type: expected string, got ${typeof attitude}`);
   }
   const trimmed = attitude.trim();
-  return trimmed.length > 0 ? trimmed : 'Balanced';
+  if (trimmed.length === 0) {
+    throw new Error('Invalid attitude value: attitude cannot be empty');
+  }
+  return trimmed;
 }
 
-/**
- * Get a weighted dice result based on attitude.
- * @param {string} attitude
- * @param {number} dieType
- * @param {WeightedRollOptions} [options]
- * @returns {number}
- */
+export function resolveRollAttitude(attitude, options = {}) {
+  const normalizedAttitude = normalizeAttitude(attitude);
+  if (normalizedAttitude !== 'Betrayer') {
+    return normalizedAttitude;
+  }
+
+  const rollCount = options.rollCount ?? 1;
+  const betrayerTurnAfter = options.betrayerTurnAfter;
+  if (!Number.isInteger(betrayerTurnAfter) || betrayerTurnAfter <= 20 || betrayerTurnAfter >= 100) {
+    throw new Error('Invalid turn threshold');
+  }
+
+  if (rollCount <= betrayerTurnAfter) {
+    return 'Lucky';
+  }
+  return 'Cursed';
+}
+
 export function getWeightedResult(attitude, dieType, options = {}) {
   if (!SUPPORTED_DIE_TYPES.includes(dieType)) {
     throw new Error(`Unsupported die type: ${dieType}`);
   }
 
-  const normalizedAttitude = normalizeAttitude(attitude);
+  const resolvedAttitude = resolveRollAttitude(attitude, options);
   const faces = createFaceList(dieType);
-  const rollCount = options.rollCount ?? 1;
 
-  switch (normalizedAttitude) {
+  switch (resolvedAttitude) {
     case 'Lucky':
-      return randomFromBuckets(getLuckyBuckets(dieType));
+      return randomFromTables(getLuckyTables(dieType));
     case 'Cursed':
-      return randomFromBuckets(getCursedBuckets(dieType));
+      return randomFromTables(getCursedTables(dieType));
     case 'Chaotic':
-      return randomFromBuckets(getChaoticBuckets(dieType));
+      return randomFromTables(getChaoticTables(dieType));
     case 'Mid':
-      return randomFromBuckets(getMidBuckets(dieType));
-    case 'Betrayer': {
-      const betrayerTurnAfter = options.betrayerTurnAfter;
-      const isValidBetrayerTurnAfter = Number.isInteger(betrayerTurnAfter)
-        && betrayerTurnAfter > 20
-        && betrayerTurnAfter < 50;
-      if (!isValidBetrayerTurnAfter) {
-        throw new Error('Betrayer roll requires betrayerTurnAfter with 20 < x < 50');
-      }
-      return randomFromBuckets(getBetrayerBuckets(dieType, rollCount, betrayerTurnAfter));
-    }
+      return randomFromTables(getMidTables(dieType));
     case 'Balanced':
-    default:
       return randomFromValues(faces);
+    default:
+      throw new Error(`Unsupported attitude: ${resolvedAttitude}`);
   }
+}
+
+/**
+ * Roll a percentile d100 using two d10 rolls.
+ *
+ * Tens die uses attitude weighting.
+ * Ones die is always unweighted (uniform d10).
+ *
+ * @param {string} attitude
+ * @param {{ rollCount?: number, betrayerTurnAfter?: number }} options
+ * @returns {number}
+ */
+export function getD100Result(attitude, options = {}) {
+  const tensRoll = getWeightedResult(attitude, 10, options);
+  const onesRoll = getWeightedResult('Balanced', 10, {});
+
+  const tensValue = (tensRoll - 1) * 10;
+  const onesValue = onesRoll - 1;
+
+  let result = tensValue + onesValue;
+  if (result === 0) {
+    result = 100;
+  }
+
+  return result;
 }

@@ -10,19 +10,25 @@
  */
 
 import {
-  DEFAULT_POINTS,
   __restoreOpenDatabaseForTests,
   __setOpenDatabaseForTests,
-  addPoints,
-  deductPoints,
-  getActiveSetId,
+  getDB,
+} from '../db.js';
+import { getBetrayerTurnAfter } from '../diceSets.js';
+import {
   getDiceSetStats,
-  getPoints,
   getRollDistribution,
   getRollHistory,
   insertRoll,
-  setPoints
-} from '../db.js';
+} from '../rollHistory.js';
+import {
+  DEFAULT_POINTS,
+  addPoints,
+  deductPoints,
+  getActiveSetId,
+  getPoints,
+  setPoints,
+} from '../userState.js';
 import {
   createFreshTestDatabase,
   getOpenDatabaseAsyncForTests,
@@ -33,6 +39,7 @@ beforeEach(async function () {
   await createFreshTestDatabase();
   __setOpenDatabaseForTests(getOpenDatabaseAsyncForTests());
 });
+
 afterEach(async function () {
   await teardownTestDatabase();
 });
@@ -42,6 +49,7 @@ afterAll(function () {
 });
 
 describe('User State Operations', function () {
+
   test('getPoints returns a number', async function () {
     const result = await getPoints();
     expect(typeof result).toBe('number');
@@ -144,5 +152,38 @@ describe('Roll History Operations', function () {
   test('getRollDistribution handles empty results', async function () {
     const result = await getRollDistribution(9999);
     expect(result).toEqual([]);
+  });
+
+  test('insertRoll updates dice_sets roll_count', async function () {
+    const setId = 1;
+    const database = await getDB();
+    const before = await database.getFirstAsync(
+      'SELECT roll_count FROM dice_sets WHERE id = ?',
+      [setId]
+    );
+
+    await insertRoll(setId, 20, 12);
+
+    const after = await database.getFirstAsync(
+      'SELECT roll_count FROM dice_sets WHERE id = ?',
+      [setId]
+    );
+
+    expect(after.roll_count).toBe((before?.roll_count ?? 0) + 1);
+  });
+
+  test('first purchase assigns and preserves hidden Betrayer turn point', async function () {
+    const database = await getDB();
+
+    await database.runAsync('UPDATE dice_sets SET owned = 1 WHERE id = 5');
+    const firstThreshold = await getBetrayerTurnAfter(5);
+
+    expect(firstThreshold).toBeGreaterThan(20);
+    expect(firstThreshold).toBeLessThan(100);
+
+    await database.runAsync('UPDATE dice_sets SET owned = 1 WHERE id = 5');
+    const secondThreshold = await getBetrayerTurnAfter(5);
+
+    expect(secondThreshold).toBe(firstThreshold);
   });
 });

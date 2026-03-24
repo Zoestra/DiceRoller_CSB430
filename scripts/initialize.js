@@ -19,6 +19,7 @@ const path = require('path');
 
 const DB_PATH = path.join(__dirname, '../diceRoller.db');
 const SCHEMA_PATH = path.join(__dirname, '../src/db/init-db.sql');
+console.log('Loading schema from:', SCHEMA_PATH);
 
 function main() {
   try {

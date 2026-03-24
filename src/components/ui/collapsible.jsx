@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ThemedText } from '../themed-text.jsx';
+import { ThemedView } from '../themed-view.jsx';
+import { IconSymbol } from './icon-symbol.jsx';
+import { Colors } from '../../constants/theme.js';
+import { useColorScheme } from '../../hooks/use-color-scheme.js';
 
 export function Collapsible({ children, title }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +27,7 @@ export function Collapsible({ children, title }) {
 
         <ThemedText type="defaultSemiBold">{title}</ThemedText>
       </TouchableOpacity>
+
       {isOpen && <ThemedView style={styles.content}>{children}</ThemedView>}
     </ThemedView>
   );
