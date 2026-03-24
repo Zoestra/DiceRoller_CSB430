@@ -10,9 +10,8 @@
 
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import TexturedDieFace from './textured-die-face.jsx';
 import Svg, { G, Path } from 'react-native-svg';
-import { DIE_GEOMETRY } from './textured-die-face.jsx';
+import TexturedDieFace, { DIE_GEOMETRY } from './textured-die-face.jsx';
 
 const DIE_TYPES = [4, 6, 8, 10, 12, 20, 100];
 
