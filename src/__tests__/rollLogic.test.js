@@ -82,6 +82,10 @@ describe('rollLogic#rollDie', function () {
     );
   });
 
+  test('throws for unknown setId', async function () {
+    await expect(rollDie({ setId: 9999, dieType: 20 })).rejects.toThrow('Unknown dice set');
+  });
+
   test('Betrayer rolls from Lucky table before turn and Cursed table after turn', async function () {
     const database = await getDB();
     const betrayerTurnAfter = 30;

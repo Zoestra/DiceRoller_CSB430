@@ -46,8 +46,20 @@ export async function rollDie({ setId, dieType }) {
     : getWeightedResult(effectiveAttitude, dieType, {});
   const awardedPoints = result;
 
-  await insertRoll(setId, dieType, result);
-  await addPoints(awardedPoints);
+  const database = await getDB();
+  await database.execAsync('BEGIN TRANSACTION;');
+  try {
+    await insertRoll(setId, dieType, result);
+    await addPoints(awardedPoints);
+    await database.execAsync('COMMIT;');
+  } catch (error) {
+    try {
+      await database.execAsync('ROLLBACK;');
+    } catch {
+      // ignore rollback errors
+    }
+    throw error;
+  }
 
   return {
     setId: setId,

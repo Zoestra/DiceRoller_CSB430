@@ -41,6 +41,7 @@ let openDatabaseAsyncFn = SQLite.openDatabaseAsync;
 export async function getDB() {
   if (!db) {
     db = await openDatabaseAsyncFn(DB_NAME);
+    await db.execAsync('PRAGMA foreign_keys = ON;');
   }
   return db;
 }
