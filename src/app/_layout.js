@@ -3,8 +3,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { DiceProvider } from '../hooks/DiceContext';
-import { SettingsProvider } from '../hooks/SettingsContext';
-import { useSettings } from '../hooks/SettingsContext';
+import { SettingsProvider } from '../context/SettingsContext.jsx';
+import { useSettings } from '../context/SettingsContext.jsx';
 
 export const unstable_settings = {
   anchor: '(tabs)',
