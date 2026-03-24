@@ -1,7 +1,7 @@
 import Svg, { Defs, ClipPath, Pattern, Image, Path, Rect, G } from 'react-native-svg';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { getSkinBySetID } from '@/db/skins';
+import { getSkinBySetId } from '@/db/skins';
 
 const SKIN_ASSETS = {
   classic: {
@@ -37,10 +37,17 @@ export default function DiceView({ setId, size = 200 }) {
     async function loadSkin() {
       try {
         setLoading(true);
-        const skin = await getSkinBySetID(setId);
+        console.log('Loading skin for setId:', setId);
+
+        const skin = await getSkinBySetId(setId);
+        console.log('Skin query result:', JSON.stringify(skin));
+
         if (!skin) throw new Error('Skin not found');
 
         const assets = SKIN_ASSETS[skin.skin_folder];
+        console.log('skin_folder value:', skin.skin_folder);
+        console.log('Assets found:', JSON.stringify(assets));
+
         if (!assets) throw new Error(`No assets for folder: ${skin.skin_folder}`);
 
         setSkinData({
@@ -50,12 +57,15 @@ export default function DiceView({ setId, size = 200 }) {
           skinName: skin.skin_name,
         });
 
+        console.log('skinData set successfully');
+
       } catch (err) {
+        console.log('ERROR in loadSkin:', err.message);
         setError(err.message);
       } finally {
         setLoading(false);
       }
-    }
+  }
 
     loadSkin();
   }, [setId]);
@@ -76,7 +86,7 @@ export default function DiceView({ setId, size = 200 }) {
   const patternId = `d20-texture-${setId}`;
 
   return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <Svg width={size} height={size} viewBox={`0 0 50 50`}>
       <Defs>
          {/* Clip path — constrains texture to die shape */}
                 <ClipPath id={clipId}>
@@ -84,13 +94,13 @@ export default function DiceView({ setId, size = 200 }) {
                 </ClipPath>
 
                 {/* Texture pattern */}
-                <Pattern id={patternId} patternUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+                <Pattern id={patternId} patternUnits="userSpaceOnUse" x="0" y="0" width="50" height="50">
                   <Image
                     href={skinData.texture}
                     x="0"
                     y="0"
-                    width={size}
-                    height={size}
+                    width="50"
+                    height="50"
                     preserveAspectRatio="xMidYMid slice"
                   />
                 </Pattern>
@@ -101,8 +111,8 @@ export default function DiceView({ setId, size = 200 }) {
               <Rect
                 x="0"
                 y="0"
-                width={size}
-                height={size}
+                width="50"
+                height="50"
                 fill={`url(#${patternId})`}
                 clipPath={`url(#${clipId})`}
               />
