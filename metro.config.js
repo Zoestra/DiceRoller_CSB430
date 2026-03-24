@@ -9,8 +9,8 @@ config.transformer = {
 
 config.resolver = {
   ...config.resolver,
-  assetExts: config.resolver.assetExts.filter(ext => ext !== 'svg'),
-  sourceExts: [...config.resolver.sourceExts, 'svg'],
+  assetExts: [...config.resolver.assetExts.filter(ext => ext !== 'svg'), 'sql'],
+  sourceExts: config.resolver.sourceExts.filter(ext => ext !== 'sql').concat(['svg']),
 };
 
 module.exports = config;
