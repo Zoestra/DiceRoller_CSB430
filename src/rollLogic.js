@@ -9,30 +9,26 @@
  */
 
 import { addPoints, getDB, insertRoll } from '@/db/db.js';
-import { getWeightedResult } from '@/diceLogic.js';
+import { getD100Result, getWeightedResult, resolveRollAttitude } from '@/diceLogic.js';
 
 async function getSetConfig(setId) {
   const database = await getDB();
   const row = await database.getFirstAsync(
-    'SELECT attitude, betrayer_turn_after FROM dice_sets WHERE id = ?',
+    'SELECT attitude, betrayer_turn_after, roll_count FROM dice_sets WHERE id = ?',
     [setId]
   );
   if (!row?.attitude) {
     return {
       attitude: 'Balanced',
       betrayerTurnAfter: null,
+      rollCount: 0,
     };
   }
   return {
     attitude: row.attitude,
     betrayerTurnAfter: row.betrayer_turn_after ?? null,
+    rollCount: row.roll_count ?? 0,
   };
-}
-
-async function getSetRollCount(setId) {
-  const database = await getDB();
-  const row = await database.getFirstAsync('SELECT COUNT(*) as total FROM roll_history WHERE set_id = ?', [setId]);
-  return row?.total ?? 0;
 }
 
 export async function rollDie({ setId, dieType }) {
@@ -44,11 +40,14 @@ export async function rollDie({ setId, dieType }) {
   }
 
   const setConfig = await getSetConfig(setId);
-  const priorRollCount = await getSetRollCount(setId);
-  const result = getWeightedResult(setConfig.attitude, dieType, {
+  const priorRollCount = setConfig.rollCount;
+  const effectiveAttitude = resolveRollAttitude(setConfig.attitude, {
     rollCount: priorRollCount + 1,
     betrayerTurnAfter: setConfig.betrayerTurnAfter,
   });
+  const result = dieType === 100
+    ? getD100Result(effectiveAttitude, {})
+    : getWeightedResult(effectiveAttitude, dieType, {});
   const awardedPoints = result;
 
   await insertRoll(setId, dieType, result);
@@ -57,7 +56,7 @@ export async function rollDie({ setId, dieType }) {
   return {
     setId: setId,
     dieType: dieType,
-    attitude: setConfig.attitude,
+    attitude: effectiveAttitude,
     result: result,
     awardedPoints: awardedPoints,
   };

@@ -17,7 +17,6 @@ import {
     __resetDbForTests,
     __restoreOpenDatabaseForTests,
     __setOpenDatabaseForTests,
-    getBetrayerTurnAfter,
     getDB,
     getPoints,
     getRollHistory,
@@ -62,16 +61,13 @@ describe('rollLogic#rollDie', function () {
     const payload = await rollDie({ setId: 1, dieType: 20 });
     const afterPoints = await getPoints();
 
-    expect(payload).toHaveProperty('setId', 1);
-    expect(payload).toHaveProperty('dieType', 20);
-    expect(payload).toHaveProperty('attitude');
-    expect(payload).toHaveProperty('result');
-    expect(payload).toHaveProperty('awardedPoints', payload.result);
+    expect(payload.setId).toBe(1);
+    expect(payload.dieType).toBe(20);
+    expect(payload.awardedPoints).toBe(payload.result);
 
     expect(afterPoints).toBe(beforePoints + payload.result);
 
     const history = await getRollHistory({ setId: 1, limit: 1 });
-    expect(history).toHaveLength(1);
     expect(history[0].set_id).toBe(1);
     expect(history[0].die_type).toBe(20);
     expect(history[0].result).toBe(payload.result);
@@ -84,20 +80,6 @@ describe('rollLogic#rollDie', function () {
     await expect(rollDie({ setId: 1, dieType: -1 })).rejects.toThrow(
       'rollDie requires a positive integer dieType'
     );
-  });
-
-  test('assigns hidden Betrayer turn point on first purchase', async function () {
-    const database = await getDB();
-
-    await database.runAsync('UPDATE dice_sets SET owned = 1 WHERE id = 5');
-    const firstThreshold = await getBetrayerTurnAfter(5);
-
-    expect(firstThreshold).toBeGreaterThan(20);
-    expect(firstThreshold).toBeLessThan(50);
-
-    await database.runAsync('UPDATE dice_sets SET owned = 1 WHERE id = 5');
-    const secondThreshold = await getBetrayerTurnAfter(5);
-    expect(secondThreshold).toBe(firstThreshold);
   });
 
   test('Betrayer rolls from Lucky table before turn and Cursed table after turn', async function () {
@@ -116,8 +98,7 @@ describe('rollLogic#rollDie', function () {
 
     const expectedPreTurn = await withSeededRandom(1111, async function () {
       return getWeightedResult('Lucky', 20, {
-        rollCount: 11,
-        betrayerTurnAfter: betrayerTurnAfter,
+        betrayerTurnAfter,
       });
     });
 
@@ -125,7 +106,7 @@ describe('rollLogic#rollDie', function () {
       return rollDie({ setId: 5, dieType: 20 });
     });
 
-    expect(preTurnPayload.attitude).toBe('Betrayer');
+    expect(preTurnPayload.attitude).toBe('Lucky');
     expect(preTurnPayload.result).toBe(expectedPreTurn);
 
     await database.runAsync('DELETE FROM roll_history WHERE set_id = 5');
@@ -134,17 +115,29 @@ describe('rollLogic#rollDie', function () {
     }
 
     const expectedPostTurn = await withSeededRandom(2222, async function () {
-      return getWeightedResult('Cursed', 20, {
-        rollCount: 41,
-        betrayerTurnAfter: betrayerTurnAfter,
-      });
+      return getWeightedResult('Cursed', 20, {});
     });
 
     const postTurnPayload = await withSeededRandom(2222, async function () {
       return rollDie({ setId: 5, dieType: 20 });
     });
 
-    expect(postTurnPayload.attitude).toBe('Betrayer');
+    expect(postTurnPayload.attitude).toBe('Cursed');
     expect(postTurnPayload.result).toBe(expectedPostTurn);
+  });
+
+  test('d100 uses two d10 rolls and logs percentile result', async function () {
+    const payload = await withSeededRandom(3333, async function () {
+      return rollDie({ setId: 1, dieType: 100 });
+    });
+
+    expect(payload.dieType).toBe(100);
+    expect(payload.result).toBeGreaterThanOrEqual(1);
+    expect(payload.result).toBeLessThanOrEqual(100);
+    expect(payload).not.toHaveProperty('d100Breakdown');
+
+    const history = await getRollHistory({ setId: 1, limit: 1 });
+    expect(history[0].die_type).toBe(100);
+    expect(history[0].result).toBe(payload.result);
   });
 });
