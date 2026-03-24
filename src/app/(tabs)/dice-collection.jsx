@@ -4,21 +4,21 @@ import { ThemedText } from '../../components/themed-text';
 import { useDiceContext } from '../../DiceContext';
 import { useSettings } from '../../context/SettingsContext';
 
-// Broken SVGs removed:
+// Removed broken SVGs:
 // import D4 from '../../../assets/images/Dice_Blanks/D4.svg';
 // import D10 from '../../../assets/images/Dice_Blanks/d10.svg';
+// import D12 from '../../../assets/images/Dice_Blanks/d12.svg';
 // import D20 from '../../../assets/images/Dice_Blanks/d20.svg';
 
 import D6 from '../../../assets/images/Dice_Blanks/D6_Blank.svg';
 import D8 from '../../../assets/images/Dice_Blanks/d8.svg';
-import D12 from '../../../assets/images/Dice_Blanks/d12.svg';
 
 const CLASSIC_DICE = [
   // { dieType: 4, label: 'd4' },
   { dieType: 6, label: 'd6' },
   { dieType: 8, label: 'd8' },
   // { dieType: 10, label: 'd10' },
-  { dieType: 12, label: 'd12' },
+  // { dieType: 12, label: 'd12' },
   // { dieType: 20, label: 'd20' },
 ];
 
@@ -27,7 +27,7 @@ const DICE_IMAGES = {
   6: D6,
   8: D8,
   // 10: D10,
-  12: D12,
+  // 12: D12,
   // 20: D20,
 };
 
