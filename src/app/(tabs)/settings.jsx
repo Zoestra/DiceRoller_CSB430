@@ -1,7 +1,7 @@
 import { Switch, Button, StyleSheet } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { useSettings } from '@/context/SettingsContext';
+import { ThemedView } from '../../components/themed-view';
+import { ThemedText } from '../../components/themed-text';
+import { useSettings } from '../../hooks/SettingsContext.jsx';
 
 export default function SettingsScreen() {
   const { theme, textSize, updateTheme, updateTextSize } = useSettings();
