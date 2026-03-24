@@ -1,10 +1,3 @@
-/**
- * Dice Collection screen — renders die thumbnails using lightweight outline SVGs.
- *
- * Minimal addition for roll/stat-screen branch to avoid importing large embedded SVGs.
- * NOTE: This file was written with AI assistance (GitHub Copilot).
- */
-
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import D10 from '../../../assets/images/Dice_Blanks/D10_outline.svg';
 import D12 from '../../../assets/images/Dice_Blanks/D12_outline.svg';
@@ -16,6 +9,7 @@ import { ThemedText } from '../../components/themed-text';
 import { ThemedView } from '../../components/themed-view';
 import { useSettings } from '../../context/SettingsContext';
 import { useDiceContext } from '../../DiceContext';
+import { useRouter } from 'expo-router';
 
 const CLASSIC_DICE = [
   { dieType: 4, label: 'd4' },
@@ -38,17 +32,22 @@ const DICE_IMAGES = {
 export default function DiceCollectionScreen() {
   const { activeDieType, setActiveDieType, equippedSetId } = useDiceContext();
   const { textSize } = useSettings();
+  const router = useRouter();
 
   function handlePress(dieType) {
     setActiveDieType(dieType);
-    console.log(`Selected die type: d${dieType}`);
+    router.push('/dice-collection/detail');
   }
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={[styles.header, { fontSize: textSize + 6 }]}>Dice Collection</ThemedText>
+      <ThemedText type="title" style={[styles.header, { fontSize: textSize + 6 }]}>
+        Dice Collection
+      </ThemedText>
 
-      <ThemedText style={[styles.subheader, { fontSize: textSize }]}>Equipped Set ID: {equippedSetId}</ThemedText>
+      <ThemedText style={[styles.subheader, { fontSize: textSize }]}>
+        Equipped Set ID: {equippedSetId}
+      </ThemedText>
 
       <FlatList
         data={CLASSIC_DICE}
@@ -67,7 +66,9 @@ export default function DiceCollectionScreen() {
               <View style={{ width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
                 <DiceImage width={64} height={64} />
               </View>
-              <ThemedText style={[styles.cardText, { fontSize: textSize + 4 }]}>{item.label}</ThemedText>
+              <ThemedText style={[styles.cardText, { fontSize: textSize + 4 }]}>
+                {item.label}
+              </ThemedText>
             </Pressable>
           );
         }}
