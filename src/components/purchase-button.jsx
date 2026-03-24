@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
+<<<<<<< HEAD
 import { getPoints, deductPoints } from '../db/userState';
 import { getDB } from '../db/db';
+=======
+import { getPoints, deductPoints } from '@/db/userState';
+import { getDB } from '@/db/db';
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
 
 export default function PurchaseButton({ setId, price, owned, onPurchaseSuccess }) {
   const [userPoints, setUserPoints] = useState(null);
@@ -95,4 +100,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610

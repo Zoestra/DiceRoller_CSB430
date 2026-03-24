@@ -1,6 +1,14 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+/**
+ * Legacy tabs explore route.
+ *
+ * Keeps compatibility by forwarding to the renamed Stats route.
+ *
+ * ---
+ * NOTE: This file was written with AI assistance (GitHub Copilot, GPT-5.3-Codex).
+ * ---
+ */
 
+<<<<<<< HEAD
 import { ExternalLink } from '../../components/external-link';
 import ParallaxScrollView from '../../components/parallax-scroll-view';
 import { ThemedText } from '../../components/themed-text';
@@ -99,17 +107,10 @@ export default function TabTwoScreen() {
       </Collapsible>
     </ParallaxScrollView>
   );
-}
+=======
+import { Redirect } from 'expo-router';
 
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});
+export default function ExploreRedirectScreen() {
+  return <Redirect href="/(tabs)/stats" />;
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
+}

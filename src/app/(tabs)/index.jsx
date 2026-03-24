@@ -1,6 +1,14 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+/**
+ * Legacy tabs index route.
+ *
+ * Keeps compatibility by forwarding to the renamed Roll route.
+ *
+ * ---
+ * NOTE: This file was written with AI assistance (GitHub Copilot, GPT-5.3-Codex).
+ * ---
+ */
 
+<<<<<<< HEAD
 import { HelloWave } from '../../components/hello-wave';
 import ParallaxScrollView from '../../components/parallax-scroll-view';
 import { ThemedText } from '../../components/themed-text';
@@ -79,23 +87,10 @@ export default function HomeScreen() {
       </ThemedView>
     </ParallaxScrollView>
   );
-}
+=======
+import { Redirect } from 'expo-router';
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+export default function IndexRedirectScreen() {
+  return <Redirect href="/(tabs)/roll" />;
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
+}

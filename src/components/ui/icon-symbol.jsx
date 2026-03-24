@@ -9,7 +9,10 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
  */
 const MAPPING = {
   'house.fill': 'home',
+  'die.face.5.fill': 'casino',
+  'chart.bar.fill': 'bar-chart',
   'paperplane.fill': 'send',
+  'gearshape.fill': 'settings',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
 };

@@ -27,6 +27,10 @@ export async function getSkinBySetId(setId) {
   const database = await getDB();
   return await database.getFirstAsync(
     'SELECT s.skin_folder, s.skin_name, s.skin_fill_color, s.skin_edge_color, s.skin_description FROM dice_sets ds JOIN skins s ON ds.set_skin = s.id WHERE ds.id = ?',
+<<<<<<< HEAD
     setId
+=======
+    [setId]
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
   );
 }

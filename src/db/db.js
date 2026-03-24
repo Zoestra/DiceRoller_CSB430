@@ -18,6 +18,10 @@
  */
 
 import { Asset } from 'expo-asset';
+<<<<<<< HEAD
+=======
+import { Platform } from 'react-native';
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
 import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
@@ -31,11 +35,68 @@ let db = null;
 let dbPromise = null;
 let openDatabaseAsyncFn = SQLite.openDatabaseAsync;
 
+<<<<<<< HEAD
+=======
+function removeSqlLineComments(sqlText) {
+  return sqlText
+    .split('\n')
+    .filter(function (line) {
+      return !line.trim().startsWith('--');
+    })
+    .join('\n');
+}
+
+function splitSqlStatements(sqlText) {
+  const sqlWithoutComments = removeSqlLineComments(sqlText);
+  return sqlWithoutComments
+    .split(';')
+    .map(function (statement) {
+      return statement.trim();
+    })
+    .filter(function (statement) {
+      return statement.length > 0;
+    });
+}
+
+async function ensureSchemaInitialized(database) {
+  const schemaExists = await database.getFirstAsync(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='user_state'"
+  );
+
+  if (schemaExists) {
+    return;
+  }
+
+  const schemaSql = await loadInitSql();
+  const statements = splitSqlStatements(schemaSql);
+
+  for (const statement of statements) {
+    try {
+      await database.execAsync(`${statement};`);
+    } catch (error) {
+      const isTriggerStatement = statement.toUpperCase().startsWith('CREATE TRIGGER');
+      if (isTriggerStatement) {
+        console.warn('Skipping trigger initialization statement:', error?.message ?? String(error));
+        continue;
+      }
+
+      const message = error?.message ?? String(error);
+      throw new Error(`Schema initialization failed: ${message}`);
+    }
+  }
+}
+
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
 async function loadInitSql() {
   const initDbSqlAssetPath = './init-db.sql';
   const initDbSqlAsset = require(initDbSqlAssetPath);
   const asset = Asset.fromModule(initDbSqlAsset);
+<<<<<<< HEAD
   if (!asset.downloaded) {
+=======
+  const shouldDownloadAsset = Platform.OS !== 'web';
+  if (shouldDownloadAsset && !asset.downloaded) {
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
     await asset.downloadAsync();
   }
 
@@ -53,13 +114,34 @@ async function loadInitSql() {
 }
 
 async function openAndInitializeDatabase() {
+<<<<<<< HEAD
   const database = await openDatabaseAsyncFn(DB_NAME);
+=======
+  let database;
+  try {
+    database = await openDatabaseAsyncFn(DB_NAME);
+  } catch (error) {
+    const message = error?.message ?? String(error);
+    const shouldFallbackToMemory = Platform.OS === 'web' && message.includes('NoModificationAllowedError');
+    if (!shouldFallbackToMemory) {
+      throw error;
+    }
+
+    console.warn('Persistent web SQLite unavailable. Falling back to in-memory DB.');
+    database = await openDatabaseAsyncFn(':memory:');
+  }
+
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
   await database.execAsync('PRAGMA foreign_keys = ON;');
 
   const isUsingProductionDatabaseOpener = openDatabaseAsyncFn === SQLite.openDatabaseAsync;
   if (isUsingProductionDatabaseOpener) {
+<<<<<<< HEAD
     const schemaSql = await loadInitSql();
     await database.execAsync(schemaSql);
+=======
+    await ensureSchemaInitialized(database);
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
   }
 
   return database;

@@ -1,4 +1,5 @@
 const { getDefaultConfig } = require('expo/metro-config');
+<<<<<<< HEAD
 
 const config = getDefaultConfig(__dirname);
 
@@ -18,4 +19,9 @@ config.resolver = {
     .concat(['svg']),
 };
 
+=======
+const config = getDefaultConfig(__dirname);
+config.resolver.assetExts = Array.from(new Set([...config.resolver.assetExts, 'wasm', 'sql']));
+config.resolver.sourceExts = config.resolver.sourceExts.filter((extension) => extension !== 'wasm' && extension !== 'sql');
+>>>>>>> f7a6a365c511fc3d8eb7aefe66c1d12a07cd9610
 module.exports = config;
