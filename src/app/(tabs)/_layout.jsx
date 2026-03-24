@@ -73,7 +73,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
-      {/*
+
+      {/* Dice Collection tab restored */}
       <Tabs.Screen
         name="dice-collection"
         options={{
@@ -81,7 +82,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="square.grid.2x2.fill" color={color} />,
         }}
       />
-      */}
+
       <Tabs.Screen
         name="dice-shop"
         options={{
