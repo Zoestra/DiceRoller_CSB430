@@ -12,6 +12,8 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { useSettings } from '../../context/SettingsContext.jsx';
+import { useColorScheme } from '../../hooks/use-color-scheme.js';
 import { useThemeColor } from '../../hooks/use-theme-color.js';
 
 import { useDiceContext } from '../../DiceContext.js';
@@ -58,6 +60,9 @@ export default function RollScreen() {
   const bg = useThemeColor({}, 'background');
   const iconColor = useThemeColor({}, 'icon');
   const textColor = useThemeColor({}, 'text');
+  const systemScheme = useColorScheme();
+  const settings = useSettings();
+  const selectedTheme = settings?.theme ?? systemScheme;
 
   useEffect(
     function loadSetNameEffect() {
@@ -125,14 +130,20 @@ export default function RollScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: bg, borderColor: textColor }] }>
-      <View style={styles.topBar}>
-        <Pressable style={styles.squareButton} onPress={handleBackPress}>
+      <View style={[styles.topBar, { borderColor: textColor }]}>
+        <Pressable
+          style={[styles.squareButton, { backgroundColor: selectedTheme === 'dark' ? '#111' : '#fff', borderColor: textColor }]}
+          onPress={handleBackPress}
+        >
           <MaterialCommunityIcons name="arrow-left" size={20} color={iconColor} />
         </Pressable>
-        <View style={styles.titleBox}>
-          <ThemedText style={styles.titleText}>{setName}</ThemedText>
+        <View style={[styles.titleBox, { backgroundColor: selectedTheme === 'dark' ? '#111' : '#fff', borderColor: textColor }]}>
+          <ThemedText style={[styles.titleText, { color: textColor }]}>{setName}</ThemedText>
         </View>
-        <Pressable style={styles.smallSquareButton} onPress={handleSettingsPress}>
+        <Pressable
+          style={[styles.smallSquareButton, { backgroundColor: selectedTheme === 'dark' ? '#111' : '#fff', borderColor: textColor }]}
+          onPress={handleSettingsPress}
+        >
           <MaterialCommunityIcons name="cog-outline" size={20} color={iconColor} />
         </Pressable>
       </View>
@@ -176,15 +187,24 @@ export default function RollScreen() {
           setId={equippedSetId ?? 1}
         />
 
-        <Pressable style={styles.rollButton} onPress={handleRollPress}>
+        <Pressable
+          style={[
+            styles.rollButton,
+            { backgroundColor: selectedTheme === 'dark' ? '#f3f3f3' : textColor, borderColor: selectedTheme === 'dark' ? '#f3f3f3' : textColor },
+          ]}
+          onPress={handleRollPress}
+        >
           {isRolling ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={selectedTheme === 'dark' ? '#111' : '#fff'} />
           ) : (
-            <ThemedText style={[styles.rollButtonText, { color: bg } ]}>ROLL DICE</ThemedText>
+            <ThemedText style={[styles.rollButtonText, { color: selectedTheme === 'dark' ? '#111' : bg }]}>ROLL DICE</ThemedText>
           )}
         </Pressable>
 
-        <Pressable style={styles.statsButton} onPress={handleStatsPress}>
+        <Pressable
+          style={[styles.statsButton, { backgroundColor: selectedTheme === 'dark' ? '#111' : bg, borderColor: textColor }]}
+          onPress={handleStatsPress}
+        >
           <MaterialCommunityIcons name="chart-bar" size={20} color={iconColor} />
           <ThemedText style={[styles.statsButtonText, { color: textColor }]}>STATS</ThemedText>
         </Pressable>
