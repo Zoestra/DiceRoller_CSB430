@@ -8,11 +8,14 @@ import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function TabTwoScreen() {
+  const { theme } = useSettings();
+
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+      headerBackgroundColor={theme === 'dark' ? '#353636' : '#D0D0D0'}
       headerImage={
         <IconSymbol
           size={310}
