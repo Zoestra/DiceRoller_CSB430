@@ -1,0 +1,564 @@
+title:	[ARCH] Create Global Context Provider
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	5
+--
+**Description:** Create DiceContext.js. Manage points, equippedSetId, activeDieType, refresh.
+
+**Acceptance Criteria:**
+- Context wraps app.
+- State updates propagate.
+────────────────────────────────────────
+title:	[NAV] Configure Stack Navigation
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Sealshusky
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	6
+--
+**Description:** Setup Stack Navigator. Enable custom header rendering.
+
+**Acceptance Criteria:**
+- Can navigate between screens.
+- Headers are customizable.
+────────────────────────────────────────
+title:	[NAV] Implement Custom Header Components
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Sealshusky
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	7
+--
+**Description:** Create Header with clickable Title (Collection) and Gear Icon (Settings).
+
+**Acceptance Criteria:**
+- Clicking Title opens Collection.
+- Clicking Gear opens Settings.
+────────────────────────────────────────
+title:	[LOGIC] Implement Weighted Dice Tables
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	1
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	8
+--
+**Description:** Create diceLogic.js. Define weighted arrays for attitudes (Lucky, Cursed, etc.).
+
+**Acceptance Criteria:**
+- getWeightedResult(attitude, dieType) returns biased numbers.
+- Function tested for correctness.
+────────────────────────────────────────
+title:	[LOGIC] Implement Roll Function
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	1
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	9
+--
+**Description:** Function to roll, calculate points, INSERT INTO roll_history (with set_id + die_type).
+
+**Acceptance Criteria:**
+- Calling function adds correct row to SQLite.
+- Returns result object.
+────────────────────────────────────────
+title:	[HOOK] Implement Shake-to-Roll Hook
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	10
+--
+**Description:** Use expo-sensors (Accelerometer). Trigger roll function on shake gesture.
+
+**Acceptance Criteria:**
+- Shaking phone triggers roll logic.
+- Debounce implemented to prevent double rolls.
+────────────────────────────────────────
+title:	[UI] Build Roll Screen Layout
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	11
+--
+**Description:** Large Die Image, Tray Container, Roll Button, Stats Button.
+
+**Acceptance Criteria:**
+- Static layout matches wireframe.
+- Components are responsive.
+────────────────────────────────────────
+title:	[UI] Build Dice Tray Component
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	12
+--
+**Description:** Horizontal scroll. Renders all die types excluding the active one.
+
+**Acceptance Criteria:**
+- If d20 active, tray shows d4-d12.
+- Tapping updates activeDieType.
+────────────────────────────────────────
+title:	[FEAT] Connect Roll Screen Actions
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	13
+--
+**Description:** Wire Roll Button and Shake Hook to Roll Function. Update Context.
+
+**Acceptance Criteria:**
+- Button/Shake updates die visual and points.
+- UI reflects state change.
+────────────────────────────────────────
+title:	[UI] Build Stats Screen Layout
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	14
+--
+**Description:** Die Image, Histogram Container, Summary Text (Total, Avg), Tray.
+
+**Acceptance Criteria:**
+- Static layout matches wireframe.
+- Navigation works.
+────────────────────────────────────────
+title:	[DB] Implement Stats SQL Queries
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	15
+--
+**Description:** Queries for COUNT, AVG, and GROUP BY filtered by set_id AND die_type.
+
+**Acceptance Criteria:**
+- Queries return correct data for specific die in set.
+- Does not load all rows into JS.
+────────────────────────────────────────
+title:	[FEAT] Render Stats Histogram
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	16
+--
+**Description:** Connect Chart Kit to Stats Queries.
+
+**Acceptance Criteria:**
+- Chart displays distribution for active die type.
+- Axes labeled correctly.
+────────────────────────────────────────
+title:	[UI] Build Collection Screen Layout
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Sealshusky
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	17
+--
+**Description:** List/Grid of available Dice Sets. Show Name, Attitude, Cost.
+
+**Acceptance Criteria:**
+- Screen renders list of all possible sets.
+- Visual hierarchy clear.
+────────────────────────────────────────
+title:	[FEAT] Implement Collection Ownership Logic
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Sealshusky
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	18
+--
+**Description:** Query dice_sets to show "Owned" vs "Buy" state.
+
+**Acceptance Criteria:**
+- Owned sets show "Equip".
+- Unowned show Cost.
+────────────────────────────────────────
+title:	[FEAT] Implement Purchase Logic
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	19
+--
+**Description:** Buy Button -> Check Points -> Deduct -> Insert Set -> Equip.
+
+**Acceptance Criteria:**
+- Points deduct correctly.
+- Set becomes owned and equipped.
+- Error if insufficient points.
+────────────────────────────────────────
+title:	[UI] Build Settings Screen Layout
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Sealshusky
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	20
+--
+**Description:** List view. Show Points Balance. Show DB Row Count.
+
+**Acceptance Criteria:**
+- Screen renders current data.
+- Buttons are visible.
+────────────────────────────────────────
+title:	[TEST] Verify Shake Sensitivity
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	22
+--
+**Description:** Test shake on physical device/emulator. Adjust sensitivity.
+
+**Acceptance Criteria:**
+- Shake triggers roll reliably.
+- No false positives during normal use.
+────────────────────────────────────────
+title:	[TEST] End-to-End Flow
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	23
+--
+**Description:** Buy Set -> Roll (Shake/Btn) -> Check Stats -> Reset.
+
+**Acceptance Criteria:**
+- Full loop works.
+- Data persists across restarts.
+────────────────────────────────────────
+title:	[UI] Build Shop Screen Layout
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	24
+--
+**Description:** Grid/list view of available dice skins. Show preview, price, and equip/buy buttons.
+
+**Acceptance Criteria:**
+- Screen renders all available skins.
+- Visual preview shows skin applied to die.
+- Buy/Equip buttons visible based on ownership.
+────────────────────────────────────────
+title:	[DB] Add Skins Table to Schema
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	25
+--
+**Description:** Create `dice_skins` table with id, name, price, preview_color, and `user_skins` junction table for ownership.
+
+**Acceptance Criteria:**
+- Tables created via initDB().
+- Foreign keys link to dice_sets.
+- Schema supports skin ownership tracking.
+────────────────────────────────────────
+title:	[FEAT] Implement Skin Purchase Logic
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	26
+--
+**Description:** Buy button checks points, deducts cost, adds skin to user_skins table. Equip button updates dice_sets with active skin_id.
+
+**Acceptance Criteria:**
+- Points deduct correctly on purchase.
+- Skin becomes owned and equipable.
+- Error handling for insufficient points.
+────────────────────────────────────────
+title:	[FEAT] Apply Skin to Roll Screen Die
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	27
+--
+**Description:** Read active skin_id from equipped dice_set. Apply color/texture to die visual on Roll and Stats screens.
+
+**Acceptance Criteria:**
+- Equipped skin visually appears on die.
+- Skin persists across app restarts.
+- Default skin shown if none equipped.
+────────────────────────────────────────
+title:	[DB] Add Achievements Tables to Schema
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	28
+--
+**Description:** Create `achievements` table (id, name, description, condition_type, condition_value, reward) and `user_achievements` table (progress, completed_at, claimed).
+
+**Acceptance Criteria:**
+- Tables created via initDB().
+- Schema supports progress tracking and reward claiming.
+- Indexes added for performance.
+────────────────────────────────────────
+title:	[UI] Build Achievements List Screen
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	29
+--
+**Description:** Scrollable list of all achievements. Show name, description, progress bar, and locked/unlocked state.
+
+**Acceptance Criteria:**
+- Screen renders all achievements from DB.
+- Progress bars reflect actual roll history.
+- Locked achievements show requirement; unlocked show 'Claim'.
+────────────────────────────────────────
+title:	[LOGIC] Implement Achievement Progress Tracking
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	30
+--
+**Description:** On each roll, check relevant achievement conditions (e.g., total_rolls, nat_20_count). Update user_achievements progress.
+
+**Acceptance Criteria:**
+- Progress updates after every roll.
+- Achievements unlock when condition met.
+- Logic is efficient (no full table scans).
+────────────────────────────────────────
+title:	[FEAT] Implement Achievement Claim Reward
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	31
+--
+**Description:** Claim button adds reward points to user_profile, marks achievement as claimed in DB.
+
+**Acceptance Criteria:**
+- Points awarded correctly.
+- Achievement shows 'Claimed' state after press.
+- Cannot claim twice.
+────────────────────────────────────────
+title:	[ARCH] Extend Context for Skins and Achievements
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	32
+--
+**Description:** Add activeSkinId, achievements, and refreshAchievements to DiceContext. Ensure Shop/Achievements screens can trigger context updates.
+
+**Acceptance Criteria:**
+- Context provides skin/achievement state globally.
+- Roll screen re-renders when skin changes.
+- Achievements screen updates after roll.
+────────────────────────────────────────
+title:	[TEST] Write Unit Tests for Shop/Achievements Logic
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	33
+--
+**Description:** Create Jest tests for skin purchase function and achievement progress checker.
+
+**Acceptance Criteria:**
+- At least 2 test cases for shop logic.
+- At least 2 test cases for achievement logic.
+- All tests pass in CI.
+────────────────────────────────────────
+title:	[TEST] Write Unit Tests for Dice Logic
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	37
+--
+**Description:** Create Jest tests for diceLogic.js. Test weighted roll functions and bias behavior.
+
+**Acceptance Criteria:**
+- At least 2 test cases written.
+- Tests verify correct roll ranges.
+- Tests verify bias behavior.
+- All tests pass.
+────────────────────────────────────────
+title:	[TEST] Write Unit Tests for Shop/Achievements Logic
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	dallasWed (Dallas Weddle)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	39
+--
+**Description:** Create Jest tests for skin purchase function and achievement progress checker.
+
+**Acceptance Criteria:**
+- At least 2 test cases written.
+- Tests verify purchase logic.
+- Tests verify achievement tracking.
+- All tests pass.
+────────────────────────────────────────
+title:	[FEAT] Implement Dark/Light Mode Toggle
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Sealshusky
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	41
+--
+**Description:** Add theme state to Context. Add toggle switch in Settings screen. Apply theme globally.
+
+**Acceptance Criteria:**
+- Toggle switches between light and dark mode.
+- Preference persists after app restart.
+- All screens respect the current theme.
+────────────────────────────────────────
+title:	[DOCS] Create README.md with Project Documentation
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe), dallasWed (Dallas Weddle), Sealshusky
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	42
+--
+**Description:** Create comprehensive README.md including: project description, team members and contributions, setup instructions, CI/CD section with screenshot.
+
+**Acceptance Criteria:**
+- Lists all 3 team members and their contributions.
+- Includes setup/installation instructions.
+- Has CI/CD section describing pipeline.
+- Includes screenshot of successful GitHub Actions run.
+────────────────────────────────────────
+title:	[DOCS] Upload Wireframes and Design Assets
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	Zoestra (Zoe)
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	43
+--
+**Description:** Add wireframe images and design documents to /docs folder in repo.
+
+**Acceptance Criteria:**
+- Wireframe images uploaded.
+- Organized in /docs folder.
+- Referenced in README.md.
+────────────────────────────────────────
+title:	[CI] Capture CI/CD Screenshot for README
+state:	OPEN
+author:	Zoestra (Zoe)
+labels:	
+comments:	0
+assignees:	
+projects:	Dice Roller React Native Assignment (Todo)
+milestone:	
+number:	44
+--
+**Description:** After CI pipeline is working, capture screenshot of successful GitHub Actions run. Add to README.md.
+
+**Acceptance Criteria:**
+- Screenshot shows passing workflow.
+- Image added to repo.
+- README.md updated with image reference.
+────────────────────────────────────────

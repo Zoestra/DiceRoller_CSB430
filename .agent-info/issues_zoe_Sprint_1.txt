@@ -1,0 +1,69 @@
+=== ISSUE #2: [SETUP] Initialize Expo Project ===
+URL: https://github.com/Zoestra/DiceRoller_CSB430/issues/2
+Status: Todo
+Iteration: Sprint 1
+
+DESCRIPTION:
+**Description:** Init Expo app. Configure app.json.
+
+**Acceptance Criteria:**
+- npx expo start runs cleanly
+
+---
+
+=== ISSUE #3: [SETUP] Install Core Dependencies ===
+URL: https://github.com/Zoestra/DiceRoller_CSB430/issues/3
+Status: Todo
+Iteration: Sprint 1
+
+DESCRIPTION:
+**Description:** Install navigation, sqlite, sensors, icons, chart libraries.
+
+**Acceptance Criteria:**
+- package.json includes expo-sqlite, expo-sensors, react-navigation, vector-icons, react-native-chart-kit.
+- No install errors.
+
+---
+
+=== ISSUE #5: [ARCH] Create Global Context Provider ===
+URL: https://github.com/Zoestra/DiceRoller_CSB430/issues/5
+Status: Todo
+Iteration: Sprint 1
+
+DESCRIPTION:
+**Description:** Create DiceContext.js. Manage points, equippedSetId, activeDieType, refresh.
+
+**Acceptance Criteria:**
+- Context wraps app.
+- State updates propagate.
+
+---
+
+=== ISSUE #9: [LOGIC] Implement Roll Function ===
+URL: https://github.com/Zoestra/DiceRoller_CSB430/issues/9
+Status: Todo
+Iteration: Sprint 1
+
+DESCRIPTION:
+**Description:** Function to roll, calculate points, INSERT INTO roll_history (with set_id + die_type).
+
+**Acceptance Criteria:**
+- Calling function adds correct row to SQLite.
+- Returns result object.
+
+---
+
+=== ISSUE #11: [UI] Build Roll Screen Layout ===
+URL: https://github.com/Zoestra/DiceRoller_CSB430/issues/11
+Status: Todo
+Iteration: Sprint 1
+
+DESCRIPTION:
+**Description:** Large Die Image, Tray Container, Roll Button, Stats Button.
+
+**Acceptance Criteria:**
+- Static layout matches wireframe.
+- Components are responsive.
+
+---
+
