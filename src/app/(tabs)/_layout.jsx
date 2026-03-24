@@ -1,6 +1,4 @@
 import { getDB } from '../../db/db';
-import { Asset } from 'expo-asset';
-import { File } from 'expo-file-system/next';
 import { Tabs } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -13,22 +11,11 @@ import { useSettings } from '../../context/SettingsContext';
 async function initializeDatabase() {
   const db = await getDB();
 
-  // Check if DB has already been initialized
   const result = await db.getFirstAsync(
     `SELECT name FROM sqlite_master WHERE type='table' AND name='user_state'`
   );
 
-  if (result) return; // Already initialized, skip
-
-  // Load the SQL file from assets
-  const asset = Asset.fromModule(require('../../../db/init-db.sql'));
-  await asset.downloadAsync();
-
-  const file = new File(asset.localUri);
-  const sql = await file.text();
-
-  await db.execAsync(sql);
-  console.log('Database initialized successfully');
+  if (result) return;
 }
 
 export default function TabLayout() {
@@ -74,7 +61,6 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Dice Collection tab restored */}
       <Tabs.Screen
         name="dice-collection"
         options={{
