@@ -17,6 +17,7 @@
  * ---
  */
 
+import { Asset } from 'expo-asset';
 import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
@@ -26,22 +27,67 @@ export { addPoints, deductPoints, DEFAULT_POINTS, getActiveSetId, getPoints, set
 const DB_NAME = 'diceRoller.db';
 
 let db = null;
+let dbPromise = null;
 let openDatabaseAsyncFn = SQLite.openDatabaseAsync;
+
+async function loadInitSql() {
+  const initDbSqlAssetPath = './init-db.sql';
+  const initDbSqlAsset = require(initDbSqlAssetPath);
+  const asset = Asset.fromModule(initDbSqlAsset);
+  if (!asset.downloaded) {
+    await asset.downloadAsync();
+  }
+
+  const assetUri = asset.localUri ?? asset.uri;
+  if (!assetUri) {
+    throw new Error('Unable to resolve init-db.sql asset URI.');
+  }
+
+  const response = await fetch(assetUri);
+  if (!response.ok) {
+    throw new Error(`Failed to load init-db.sql asset: HTTP ${response.status}`);
+  }
+
+  return response.text();
+}
+
+async function openAndInitializeDatabase() {
+  const database = await openDatabaseAsyncFn(DB_NAME);
+  await database.execAsync('PRAGMA foreign_keys = ON;');
+
+  const isUsingProductionDatabaseOpener = openDatabaseAsyncFn === SQLite.openDatabaseAsync;
+  if (isUsingProductionDatabaseOpener) {
+    const schemaSql = await loadInitSql();
+    await database.execAsync(schemaSql);
+  }
+
+  return database;
+}
 
 /**
  * Get cached database connection
  *
- * Assumes the database was initialized via `npm run initialize` at setup time.
  * On first call, opens the database file.
  * On subsequent calls, returns cached connection.
  *
  * @returns {Promise<SQLite.SQLiteDatabase>}
  */
 export async function getDB() {
-  if (!db) {
-    db = await openDatabaseAsyncFn(DB_NAME);
+  if (db !== null) {
+    return db;
   }
-  return db;
+
+  if (dbPromise === null) {
+    dbPromise = openAndInitializeDatabase();
+  }
+
+  try {
+    db = await dbPromise;
+    return db;
+  } catch (error) {
+    dbPromise = null;
+    throw error;
+  }
 }
 
 /**
@@ -58,18 +104,22 @@ export async function resetDatabase() {
     DROP TABLE IF EXISTS user_state;
   `);
   db = null;
+  dbPromise = null;
 }
 
 export function __resetDbForTests() {
   db = null;
+  dbPromise = null;
 }
 
 export function __setOpenDatabaseForTests(openDatabaseAsync) {
   openDatabaseAsyncFn = openDatabaseAsync;
   db = null;
+  dbPromise = null;
 }
 
 export function __restoreOpenDatabaseForTests() {
   openDatabaseAsyncFn = SQLite.openDatabaseAsync;
   db = null;
+  dbPromise = null;
 }
