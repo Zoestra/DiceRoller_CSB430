@@ -127,7 +127,17 @@ function getLabelFontSize(dieType) {
   return 17;
 }
 
-export default function TexturedDieFace({ setId, dieType = 20, resultValue = null, size = 200 }) {
+export default function TexturedDieFace({
+  setId,
+  dieType = 20,
+  resultValue = null,
+  displayLabel = null,
+  labelX = 25,
+  labelY = 29,
+  labelHaloOffsetY = 0.35,
+  labelFontSize = null,
+  size = 200,
+}) {
   const [skinData, setSkinData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -191,7 +201,13 @@ export default function TexturedDieFace({ setId, dieType = 20, resultValue = nul
 
   const clipId = `${svgIdPrefixRef.current}-clip-${setId}-${dieType}`;
   const patternId = `${svgIdPrefixRef.current}-texture-${setId}-${dieType}`;
-  const displayValue = Number.isInteger(resultValue) ? String(resultValue) : '?';
+  const displayValue =
+    typeof displayLabel === 'string' && displayLabel.length > 0
+      ? displayLabel
+      : Number.isInteger(resultValue)
+        ? String(resultValue)
+        : '?';
+  const resolvedLabelFontSize = labelFontSize ?? getLabelFontSize(dieType);
 
   return (
     <Svg width={size} height={size} viewBox="0 0 50 50">
@@ -251,10 +267,10 @@ export default function TexturedDieFace({ setId, dieType = 20, resultValue = nul
       </G>
 
       <SvgText
-        x="25"
-        y="29.35"
+        x={labelX}
+        y={labelY + labelHaloOffsetY}
         textAnchor="middle"
-        fontSize={getLabelFontSize(dieType) + 0.35}
+        fontSize={resolvedLabelFontSize + 0.35}
         fontWeight="900"
         fill="#FFFFFF"
         fillOpacity={0.72}>
@@ -262,10 +278,10 @@ export default function TexturedDieFace({ setId, dieType = 20, resultValue = nul
       </SvgText>
 
       <SvgText
-        x="25"
-        y="29"
+        x={labelX}
+        y={labelY}
         textAnchor="middle"
-        fontSize={getLabelFontSize(dieType)}
+        fontSize={resolvedLabelFontSize}
         fontWeight="900"
         fill={skinData.edgeColor}>
         {displayValue}

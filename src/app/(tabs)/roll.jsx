@@ -20,6 +20,30 @@ import { ThemedText } from '../../components/themed-text';
 import { getDB } from '../../db/db.js';
 import { rollDie } from '../../rollLogic.js';
 
+function getD100FaceLabels(resultValue) {
+  if (!Number.isInteger(resultValue) || resultValue < 1 || resultValue > 100) {
+    return {
+      tensLabel: '?',
+      onesLabel: '?',
+    };
+  }
+
+  if (resultValue === 100) {
+    return {
+      tensLabel: '00',
+      onesLabel: '0',
+    };
+  }
+
+  const tensValue = Math.floor(resultValue / 10) * 10;
+  const onesValue = resultValue % 10;
+
+  return {
+    tensLabel: String(tensValue).padStart(2, '0'),
+    onesLabel: String(onesValue),
+  };
+}
+
 export default function RollScreen() {
   const router = useRouter();
   const { points, equippedSetId, activeDieType, refresh, setActiveDieType } = useDiceContext();
@@ -28,6 +52,8 @@ export default function RollScreen() {
   const [lastResult, setLastResult] = useState(null);
   const [isRolling, setIsRolling] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const d100FaceLabels = getD100FaceLabels(lastResult);
 
   useEffect(
     function loadSetNameEffect() {
@@ -101,12 +127,33 @@ export default function RollScreen() {
       </View>
 
       <View style={styles.mainDieArea}>
-        <TexturedDieFace
-          setId={equippedSetId ?? 1}
-          dieType={activeDieType}
-          resultValue={lastResult}
-          size={240}
-        />
+        {activeDieType === 100 ? (
+          <View style={styles.percentileDiceRow}>
+            <TexturedDieFace
+              setId={equippedSetId ?? 1}
+              dieType={10}
+              displayLabel={d100FaceLabels.tensLabel}
+              labelY={28.2}
+              labelFontSize={11.75}
+              size={132}
+            />
+            <TexturedDieFace
+              setId={equippedSetId ?? 1}
+              dieType={10}
+              displayLabel={d100FaceLabels.onesLabel}
+              labelY={28.2}
+              labelFontSize={13}
+              size={132}
+            />
+          </View>
+        ) : (
+          <TexturedDieFace
+            setId={equippedSetId ?? 1}
+            dieType={activeDieType}
+            resultValue={lastResult}
+            size={240}
+          />
+        )}
         <ThemedText style={styles.pointsText}>{`Points: ${points}`}</ThemedText>
         {errorMessage.length > 0 ? <ThemedText style={styles.errorText}>{errorMessage}</ThemedText> : null}
       </View>
@@ -193,6 +240,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '900',
     textTransform: 'uppercase',
+  },
+  percentileDiceRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
   },
   errorText: {
     marginTop: 6,
