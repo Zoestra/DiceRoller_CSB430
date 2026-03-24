@@ -17,12 +17,8 @@ async function getSetConfig(setId) {
     'SELECT attitude, betrayer_turn_after, roll_count FROM dice_sets WHERE id = ?',
     [setId]
   );
-  if (!row?.attitude) {
-    return {
-      attitude: 'Balanced',
-      betrayerTurnAfter: null,
-      rollCount: 0,
-    };
+  if (!row) {
+    throw new Error('Unknown dice set');
   }
   return {
     attitude: row.attitude,
