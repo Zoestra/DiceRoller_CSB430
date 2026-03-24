@@ -3,6 +3,7 @@ import { ThemedView } from '../../components/themed-view';
 import { ThemedText } from '../../components/themed-text';
 import { useDiceContext } from '../../DiceContext';
 import { useSettings } from '../../context/SettingsContext';
+import { useRouter } from 'expo-router';
 
 // Removed broken SVGs:
 // import D4 from '../../../assets/images/Dice_Blanks/D4.svg';
@@ -34,10 +35,11 @@ const DICE_IMAGES = {
 export default function DiceCollectionScreen() {
   const { activeDieType, setActiveDieType, equippedSetId } = useDiceContext();
   const { textSize } = useSettings();
+  const router = useRouter();
 
   function handlePress(dieType) {
     setActiveDieType(dieType);
-    console.log(`Selected die type: d${dieType}`);
+    router.push('/dice-detail');
   }
 
   return (
