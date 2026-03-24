@@ -18,8 +18,8 @@
  */
 
 import { Asset } from 'expo-asset';
-import { Platform } from 'react-native';
 import * as SQLite from 'expo-sqlite';
+import { Platform } from 'react-native';
 
 // Implemented modules
 export { getBetrayerTurnAfter } from './diceSets.js';
@@ -43,14 +43,52 @@ function removeSqlLineComments(sqlText) {
 
 function splitSqlStatements(sqlText) {
   const sqlWithoutComments = removeSqlLineComments(sqlText);
-  return sqlWithoutComments
-    .split(';')
-    .map(function (statement) {
-      return statement.trim();
-    })
-    .filter(function (statement) {
-      return statement.length > 0;
-    });
+
+  const lines = sqlWithoutComments.split('\n');
+  const statements = [];
+  let current = '';
+  let inTrigger = false;
+
+  for (let rawLine of lines) {
+    const line = rawLine + '\n';
+    const trimmedUpper = rawLine.trim().toUpperCase();
+
+    // Detect start of a trigger definition
+    if (!inTrigger && trimmedUpper.startsWith('CREATE TRIGGER')) {
+      inTrigger = true;
+    }
+
+    current += line;
+
+    if (inTrigger) {
+      // Detect end of trigger block (END or END;)
+      if (/^END\s*;?$/i.test(rawLine.trim())) {
+        statements.push(current.trim());
+        current = '';
+        inTrigger = false;
+      }
+      continue;
+    }
+
+    // When not in a trigger, split on semicolons at statement boundaries
+    if (rawLine.includes(';')) {
+      // A line may contain multiple statements; split them safely
+      const parts = current.split(';');
+      for (let i = 0; i < parts.length - 1; i++) {
+        const stmt = parts[i].trim();
+        if (stmt.length > 0) statements.push(stmt);
+      }
+      current = parts[parts.length - 1];
+    }
+  }
+
+  if (current.trim().length > 0) {
+    statements.push(current.trim());
+  }
+
+  return statements.filter(function (s) {
+    return s.length > 0;
+  });
 }
 
 async function ensureSchemaInitialized(database) {
@@ -160,15 +198,45 @@ export async function getDB() {
  */
 export async function resetDatabase() {
   const database = await getDB();
-  await database.execAsync(`
-    DROP TABLE IF EXISTS roll_history;
-    DROP TABLE IF EXISTS achievements;
-    DROP TABLE IF EXISTS skins;
-    DROP TABLE IF EXISTS dice_sets;
-    DROP TABLE IF EXISTS user_state;
-  `);
+
+  // Disable foreign key enforcement so we can drop tables in any order
+  try {
+    await database.execAsync('PRAGMA foreign_keys = OFF;');
+  } catch (err) {
+    console.warn('Failed to disable foreign_keys pragma:', err?.message ?? String(err));
+  }
+
+  try {
+    await database.execAsync(`
+      DROP TRIGGER IF EXISTS after_roll_insert;
+      DROP TRIGGER IF EXISTS initialize_betrayer_turn_after;
+
+      DROP TABLE IF EXISTS roll_history;
+      DROP TABLE IF EXISTS achievements;
+      DROP TABLE IF EXISTS skins;
+      DROP TABLE IF EXISTS dice_sets;
+      DROP TABLE IF EXISTS user_state;
+
+      -- Reset sqlite_sequence so AUTOINCREMENT values start over
+      DELETE FROM sqlite_sequence WHERE name IN ('skins','dice_sets','roll_history','achievements');
+    `);
+  } catch (err) {
+    console.warn('Error while dropping tables during resetDatabase:', err?.message ?? String(err));
+  } finally {
+    // Re-enable foreign key enforcement on this connection
+    try {
+      await database.execAsync('PRAGMA foreign_keys = ON;');
+    } catch (err) {
+      console.warn('Failed to re-enable foreign_keys pragma:', err?.message ?? String(err));
+    }
+  }
+
+  // Clear cached connection so getDB() will recreate and initialize schema
   db = null;
   dbPromise = null;
+
+  // Re-open and initialize immediately so the DB is reseeded right away
+  await getDB();
 }
 
 export function __resetDbForTests() {
