@@ -10,29 +10,29 @@
  */
 
 import {
-  __restoreOpenDatabaseForTests,
-  __setOpenDatabaseForTests,
-  getDB,
+    __restoreOpenDatabaseForTests,
+    __setOpenDatabaseForTests,
+    getDB,
 } from '../db.js';
 import { getBetrayerTurnAfter } from '../diceSets.js';
 import {
-  getDiceSetStats,
-  getRollDistribution,
-  getRollHistory,
-  insertRoll,
+    getDiceSetStats,
+    getRollDistribution,
+    getRollHistory,
+    insertRoll,
 } from '../rollHistory.js';
 import {
-  DEFAULT_POINTS,
-  addPoints,
-  deductPoints,
-  getActiveSetId,
-  getPoints,
-  setPoints,
+    DEFAULT_POINTS,
+    addPoints,
+    deductPoints,
+    getActiveSetId,
+    getPoints,
+    setPoints,
 } from '../userState.js';
 import {
-  createFreshTestDatabase,
-  getOpenDatabaseAsyncForTests,
-  teardownTestDatabase,
+    createFreshTestDatabase,
+    getOpenDatabaseAsyncForTests,
+    teardownTestDatabase,
 } from './testDatabase.js';
 
 beforeEach(async function () {
@@ -101,6 +101,18 @@ describe('Roll History Operations', function () {
     expect(result).toEqual([]);
   });
 
+  test('getRollHistory filters by dieType when provided', async function () {
+    const setId = 1;
+    await insertRoll(setId, 6, 4);
+    await insertRoll(setId, 20, 17);
+
+    const result = await getRollHistory({ setId, dieType: 6 });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].die_type).toBe(6);
+    expect(result[0].result).toBe(4);
+  });
+
   test('insertRoll adds a roll to history', async function () {
     const setId = 1;
     await insertRoll(setId, 20, 15);
@@ -133,6 +145,20 @@ describe('Roll History Operations', function () {
     expect(result.total_rolls).toBe(3);
   });
 
+  test('getDiceSetStats filters by dieType when provided', async function () {
+    const setId = 3;
+    await insertRoll(setId, 6, 1);
+    await insertRoll(setId, 6, 6);
+    await insertRoll(setId, 20, 20);
+
+    const result = await getDiceSetStats(setId, 6);
+
+    expect(result.total_rolls).toBe(2);
+    expect(result.max_roll).toBe(6);
+    expect(result.max_rolls).toBe(1);
+    expect(result.nat_1s).toBe(1);
+  });
+
   test('getRollDistribution returns array of result groups', async function () {
     const setId = 4;
     await insertRoll(setId, 20, 1);
@@ -152,6 +178,17 @@ describe('Roll History Operations', function () {
   test('getRollDistribution handles empty results', async function () {
     const result = await getRollDistribution(9999);
     expect(result).toEqual([]);
+  });
+
+  test('getRollDistribution filters by dieType when provided', async function () {
+    const setId = 4;
+    await insertRoll(setId, 10, 3);
+    await insertRoll(setId, 10, 3);
+    await insertRoll(setId, 20, 20);
+
+    const result = await getRollDistribution(setId, 10);
+
+    expect(result).toEqual([{ result: 3, count: 2 }]);
   });
 
   test('insertRoll updates dice_sets roll_count', async function () {

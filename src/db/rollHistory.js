@@ -38,6 +38,7 @@ import { getDB } from './db.js';
 /**
  * @typedef {Object} RollHistoryOptions
  * @property {number} [setId] - Optional: filter by dice set ID
+ * @property {number} [dieType] - Optional: filter by die type
  * @property {number} [limit=100] - Maximum results to return (default 100)
  */
 
@@ -64,17 +65,25 @@ export async function insertRoll(setId, dieType, result) {
  * @param {RollHistoryOptions} [options] - Filter and limit options
  * @returns {Promise<RollHistoryRow[]>}
  */
-export async function getRollHistory({ setId, limit = 100 } = {}) {
+export async function getRollHistory({ setId, dieType, limit = 100 } = {}) {
   const database = await getDB();
+  const whereClauses = [];
+  const params = [];
+
   if (setId) {
-    return await database.getAllAsync(
-      'SELECT * FROM roll_history WHERE set_id = ? ORDER BY rolled_at DESC LIMIT ?',
-      [setId, limit]
-    );
+    whereClauses.push('set_id = ?');
+    params.push(setId);
   }
+
+  if (dieType) {
+    whereClauses.push('die_type = ?');
+    params.push(dieType);
+  }
+
+  const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
   return await database.getAllAsync(
-    'SELECT * FROM roll_history ORDER BY rolled_at DESC LIMIT ?',
-    [limit]
+    `SELECT * FROM roll_history ${whereSql} ORDER BY rolled_at DESC LIMIT ?`,
+    [...params, limit]
   );
 }
 
@@ -82,10 +91,16 @@ export async function getRollHistory({ setId, limit = 100 } = {}) {
  * Get aggregated stats for a specific dice set.
  * Computes average, min, max, critical successes, and critical failures.
  * @param {number} setId - Dice set ID to analyze
+ * @param {number} [dieType] - Optional die type filter
  * @returns {Promise<DiceSetStats|null>} - Stats object or null if no rolls exist
  */
-export async function getDiceSetStats(setId) {
+export async function getDiceSetStats(setId, dieType) {
   const database = await getDB();
+  const params = [setId];
+  const dieTypeClause = dieType ? 'AND die_type = ?' : '';
+  if (dieType) {
+    params.push(dieType);
+  }
   return await database.getFirstAsync(`
     SELECT
       COUNT(*) as total_rolls,
@@ -96,22 +111,30 @@ export async function getDiceSetStats(setId) {
       SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) as nat_1s
     FROM roll_history
     WHERE set_id = ?
-  `, [setId]);
+    ${dieTypeClause}
+  `, params);
 }
 
 /**
  * Get distribution breakdown for a dice set histogram.
  * Shows count of each die face value rolled.
  * @param {number} setId - Dice set ID to analyze
+ * @param {number} [dieType] - Optional die type filter
  * @returns {Promise<RollDistributionEntry[]>} - Array of result/count pairs ordered by result value
  */
-export async function getRollDistribution(setId) {
+export async function getRollDistribution(setId, dieType) {
   const database = await getDB();
+  const params = [setId];
+  const dieTypeClause = dieType ? 'AND die_type = ?' : '';
+  if (dieType) {
+    params.push(dieType);
+  }
   return await database.getAllAsync(`
     SELECT result, COUNT(*) as count
     FROM roll_history
     WHERE set_id = ?
+    ${dieTypeClause}
     GROUP BY result
     ORDER BY result
-  `, [setId]);
+  `, params);
 }
