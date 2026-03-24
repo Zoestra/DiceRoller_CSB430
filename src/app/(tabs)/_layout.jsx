@@ -1,15 +1,14 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { File } from 'expo-file-system/next';
-import { Asset } from 'expo-asset';
 import { getDB } from '@/db/db';
+import { Asset } from 'expo-asset';
+import { File } from 'expo-file-system/next';
+import { Tabs } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { HapticTab } from '../../components/haptic-tab';
+import { IconSymbol } from '../../components/ui/icon-symbol';
+import { Colors } from '../../constants/theme';
+import { useSettings } from '../../context/SettingsContext.jsx';
 
 async function initializeDatabase() {
   const db = await getDB();
@@ -33,7 +32,7 @@ async function initializeDatabase() {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useSettings();
   const [dbReady, setDbReady] = useState(false);
 
   useEffect(() => {
@@ -53,9 +52,12 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[theme].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: Colors[theme].background,
+        },
       }}>
       <Tabs.Screen
         name="index"
@@ -71,11 +73,27 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
+      {/*
+      <Tabs.Screen
+        name="dice-collection"
+        options={{
+          title: 'Dice Collection',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="square.grid.2x2.fill" color={color} />,
+        }}
+      />
+      */}
       <Tabs.Screen
         name="dice-shop"
         options={{
           title: 'Shop',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
         }}
       />
     </Tabs>
