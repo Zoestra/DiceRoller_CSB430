@@ -4,12 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useDiceContext } from '@/context/DiceContext';
 import { useSettings } from '@/context/SettingsContext';
 
-interface DiceItem {
-  dieType: number;
-  label: string;
-}
-
-const CLASSIC_DICE: DiceItem[] = [
+const CLASSIC_DICE = [
   { dieType: 4, label: 'd4' },
   { dieType: 6, label: 'd6' },
   { dieType: 8, label: 'd8' },
@@ -22,7 +17,7 @@ export default function DiceCollectionScreen() {
   const { activeDieType, setActiveDieType, equippedSetId } = useDiceContext();
   const { textSize } = useSettings();
 
-  function handlePress(dieType: number) {
+  function handlePress(dieType) {
     // The inspector screen isn't implemented yet.
     // This will be replaced with router.push() once that screen exists.
     setActiveDieType(dieType);
