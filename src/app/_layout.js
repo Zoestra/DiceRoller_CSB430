@@ -17,19 +17,25 @@ export const unstable_settings = {
   anchor : '(tabs)' ,
 } ;
 
-export default function RootLayout ( ) {
+function LayoutWithSettings() {
   const { theme } = useSettings();
 
   return (
+    <ThemeProvider value = { theme === 'dark' ? DarkTheme : DefaultTheme } >
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+      </Stack>
+      <StatusBar style="auto" />
+    </ThemeProvider>
+  );
+}
+
+export default function RootLayout ( ) {
+  return (
     <SettingsProvider>
       <DiceProvider>
-        <ThemeProvider value = { theme === 'dark' ? DarkTheme : DefaultTheme } >
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
+        <LayoutWithSettings />
       </DiceProvider>
     </SettingsProvider>
   ) ;
