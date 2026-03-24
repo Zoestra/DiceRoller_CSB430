@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { useSettings } from '@/context/SettingsContext';
+import { useSettings } from '../context/SettingsContext.jsx';
 
 export function ThemedView({ style, ...otherProps }) {
   const { theme } = useSettings();
