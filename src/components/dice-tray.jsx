@@ -9,11 +9,11 @@
  */
 
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from './themed-text';
 
-const DIE_TYPES = [4, 6, 8, 10, 12, 20];
+const DIE_TYPES = [4, 6, 8, 10, 12, 20, 100];
 
 const DIE_ICON_BY_TYPE = {
   4: 'dice-d4-outline',
@@ -22,6 +22,7 @@ const DIE_ICON_BY_TYPE = {
   10: 'dice-d10-outline',
   12: 'dice-d12-outline',
   20: 'dice-d20-outline',
+  100: 'dice-multiple-outline',
 };
 
 /**
@@ -38,10 +39,7 @@ export function DiceTray({ activeDieType, onSelectDieType, style }) {
 
   return (
     <View style={[styles.container, style]}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+      <View style={styles.row}>
         {availableDieTypes.map(function (dieType) {
           return (
             <Pressable
@@ -57,7 +55,7 @@ export function DiceTray({ activeDieType, onSelectDieType, style }) {
             </Pressable>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -72,20 +70,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  scrollContent: {
+  row: {
+    flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    flexGrow: 1,
+    width: '100%',
   },
   dieButton: {
-    width: 46,
+    width: 40,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    marginRight: 12,
   },
   dieLabel: {
-    marginTop: 4,
-    fontSize: 12,
+    marginTop: 3,
+    fontSize: 10,
     fontWeight: '900',
     color: '#111',
   },

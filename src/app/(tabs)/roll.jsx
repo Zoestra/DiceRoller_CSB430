@@ -15,29 +15,10 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { useDiceContext } from '../../DiceContext.js';
 import { DiceTray } from '../../components/dice-tray.jsx';
-import DiceView from '../../components/textured-die.jsx';
+import TexturedDieFace from '../../components/textured-die-face.jsx';
 import { ThemedText } from '../../components/themed-text';
 import { getDB } from '../../db/db.js';
 import { rollDie } from '../../rollLogic.js';
-
-function getDieIconName(dieType) {
-  if (dieType === 4) {
-    return 'dice-d4-outline';
-  }
-  if (dieType === 6) {
-    return 'dice-d6-outline';
-  }
-  if (dieType === 8) {
-    return 'dice-d8-outline';
-  }
-  if (dieType === 10) {
-    return 'dice-d10-outline';
-  }
-  if (dieType === 12) {
-    return 'dice-d12-outline';
-  }
-  return 'dice-d20-outline';
-}
 
 export default function RollScreen() {
   const router = useRouter();
@@ -120,17 +101,12 @@ export default function RollScreen() {
       </View>
 
       <View style={styles.mainDieArea}>
-        {activeDieType === 20 ? (
-          <DiceView setId={equippedSetId ?? 1} size={240} />
-        ) : (
-          <View style={styles.fallbackDieBox}>
-            <MaterialCommunityIcons name={getDieIconName(activeDieType)} size={120} color="#111" />
-            <ThemedText style={styles.fallbackDieLabel}>{`d${activeDieType}`}</ThemedText>
-          </View>
-        )}
-        <ThemedText style={styles.resultText}>
-          {lastResult === null ? 'Result: --' : `Result: ${lastResult}`}
-        </ThemedText>
+        <TexturedDieFace
+          setId={equippedSetId ?? 1}
+          dieType={activeDieType}
+          resultValue={lastResult}
+          size={240}
+        />
         <ThemedText style={styles.pointsText}>{`Points: ${points}`}</ThemedText>
         {errorMessage.length > 0 ? <ThemedText style={styles.errorText}>{errorMessage}</ThemedText> : null}
       </View>
@@ -211,30 +187,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
-  fallbackDieBox: {
-    width: 240,
-    height: 240,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
-    borderColor: '#000',
-    backgroundColor: '#fff',
-  },
-  fallbackDieLabel: {
-    color: '#111',
-    fontWeight: '900',
-    fontSize: 20,
-    marginTop: 8,
-  },
-  resultText: {
-    marginTop: 12,
-    color: '#111',
-    fontSize: 18,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-  },
   pointsText: {
-    marginTop: 6,
+    marginTop: 12,
     color: '#111',
     fontSize: 16,
     fontWeight: '900',
