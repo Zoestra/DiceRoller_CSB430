@@ -20,9 +20,9 @@
 import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
-// export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
-// export { addPoints, deductPoints, DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
-// export { getAllSkins, getSkinByID } from './skins.js';
+export { getBetrayerTurnAfter } from './diceSets.js';
+export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
+export { addPoints, deductPoints, DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
 
 const DB_NAME = 'diceRoller.db';
 
@@ -41,6 +41,7 @@ let openDatabaseAsyncFn = SQLite.openDatabaseAsync;
 export async function getDB() {
   if (!db) {
     db = await openDatabaseAsyncFn(DB_NAME);
+    await db.execAsync('PRAGMA foreign_keys = ON;');
   }
   return db;
 }
