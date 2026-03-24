@@ -11,11 +11,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 import {
-  DEFAULT_POINTS,
-  getActiveSetId,
-  getPoints,
-  setActiveSetId,
-  setPoints
+    DEFAULT_POINTS,
+    getActiveSetId,
+    getPoints,
+    setActiveSetId,
+    setPoints
 } from './db/db.js';
 
 const DiceContext = createContext(null);

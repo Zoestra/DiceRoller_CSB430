@@ -10,21 +10,25 @@
  */
 
 import {
-  DEFAULT_POINTS,
   __restoreOpenDatabaseForTests,
   __setOpenDatabaseForTests,
-  addPoints,
-  deductPoints,
-  getActiveSetId,
-  getBetrayerTurnAfter,
   getDB,
+} from '../db.js';
+import { getBetrayerTurnAfter } from '../diceSets.js';
+import {
   getDiceSetStats,
-  getPoints,
   getRollDistribution,
   getRollHistory,
   insertRoll,
-  setPoints
-} from '../db.js';
+} from '../rollHistory.js';
+import {
+  DEFAULT_POINTS,
+  addPoints,
+  deductPoints,
+  getActiveSetId,
+  getPoints,
+  setPoints,
+} from '../userState.js';
 import {
   createFreshTestDatabase,
   getOpenDatabaseAsyncForTests,
@@ -35,6 +39,7 @@ beforeEach(async function () {
   await createFreshTestDatabase();
   __setOpenDatabaseForTests(getOpenDatabaseAsyncForTests());
 });
+
 afterEach(async function () {
   await teardownTestDatabase();
 });
@@ -44,6 +49,7 @@ afterAll(function () {
 });
 
 describe('User State Operations', function () {
+
   test('getPoints returns a number', async function () {
     const result = await getPoints();
     expect(typeof result).toBe('number');
