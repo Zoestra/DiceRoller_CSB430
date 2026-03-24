@@ -21,7 +21,7 @@ async function initializeDatabase() {
   if (result) return; // Already initialized, skip
 
   // Load the SQL file from assets
-  const asset = Asset.fromModule(require('../../db/init-db.sql'));
+  const asset = Asset.fromModule(require('../../../db/init-db.sql'));
   await asset.downloadAsync();
 
   const file = new File(asset.localUri);
