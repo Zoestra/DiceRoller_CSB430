@@ -2,7 +2,8 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import { DiceProvider } from '../hooks/DiceContext';
+
+import { DiceProvider } from '../DiceContext.js';
 import { SettingsProvider } from '../context/SettingsContext.jsx';
 import { useSettings } from '../context/SettingsContext.jsx';
 
