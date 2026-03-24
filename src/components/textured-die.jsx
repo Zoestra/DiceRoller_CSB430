@@ -3,7 +3,7 @@
 import Svg, { Defs, ClipPath, Pattern, Image, Path, Rect } from 'react-native-svg';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { getSkinBySetId } from '../../db/skins';
+import { getSkinBySetId } from '../db/skins';
 
 const SKIN_ASSETS = {
   classic: {
