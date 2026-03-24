@@ -21,7 +21,7 @@ export default function SettingsScreen() {
       <ThemedView style={styles.section}>
         <ThemedText>Text Size: {textSize}</ThemedText>
         <Button title="Increase" onPress={() => updateTextSize(textSize + 1)} />
-        <Button title="Decrease" onPress={() => updateTextSize(textSize - 1)} />
+        <Button title="Decrease" onPress={() => updateTextSize(Math.max(10, textSize - 1))} />
       </ThemedView>
     </ThemedView>
   );
