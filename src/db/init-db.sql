@@ -87,20 +87,6 @@ CREATE TABLE IF NOT EXISTS achievements (
 );
 
 -- ============================================
--- TABLE: user_state
--- Single row for global user state
--- ============================================
-CREATE TABLE IF NOT EXISTS user_state (
-  id INTEGER PRIMARY KEY CHECK (id = 1),
-  points INTEGER NOT NULL DEFAULT 0,
-  total_rolls INTEGER NOT NULL DEFAULT 0,
-  active_set_id INTEGER,
-  dark_mode INTEGER NOT NULL DEFAULT 0,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (active_set_id) REFERENCES dice_sets(id)
-);
-
--- ============================================
 -- INDEXES
 -- For query performance optimization
 -- ============================================
@@ -152,3 +138,101 @@ VALUES
 -- ============================================
 INSERT OR IGNORE INTO user_state (id, points, total_rolls, active_set_id, dark_mode)
 VALUES (1, 0, 0, 1, 0);
+
+-- ===========================================
+-- ACHIEVEMENT TRIGGERS
+-- ===========================================
+
+-- First Roll Achievement
+CREATE TRIGGER IF NOT EXISTS trg_first_roll
+AFTER INSERT ON roll_history
+-- Check for first roll, only triggers for first roll
+WHEN (SELECT claimed FROM achievements WHERE achv_script = 'first_roll') = 0
+BEGIN
+  UPDATE achievements SET claimed = 1 WHERE achv_script = 'first_roll';
+  UPDATE user_state SET points = points + (
+    SELECT reward_points FROM achievements WHERE achv_script = 'first_roll'
+  ) WHERE id = 1;
+END;
+
+-- Natural 20 Achievement
+CREATE TRIGGER IF NOT EXISTS trg_nat_20
+AFTER INSERT ON roll_history
+-- Check for the first natural 20, only triggers for first natural 20
+WHEN NEW.result = 20
+  AND NEW.die_type = 20
+  AND (SELECT claimed FROM achievements WHERE achv_script = 'nat_20') = 0
+BEGIN
+  UPDATE achievements SET claimed = 1 WHERE achv_script = 'nat_20';
+  UPDATE user_state SET points = points + (
+    SELECT reward_points FROM achievements WHERE achv_script = 'nat_20'
+  ) WHERE id = 1;
+END;
+
+-- Nat 20 Master (50 nat 20s)
+CREATE TRIGGER IF NOT EXISTS trg_nat_20_master
+AFTER INSERT ON roll_history
+WHEN NEW.result = 20
+  AND NEW.die_type = 20
+  AND (SELECT claimed FROM achievements WHERE achv_script = 'nat_20_master') = 0
+  -- Check if the amount of 20s rolled is at least 50
+  AND (SELECT COUNT(*) FROM roll_history WHERE result = 20 AND die_type = 20) >= 50
+BEGIN
+  UPDATE achievements SET claimed = 1 WHERE achv_script = 'nat_20_master';
+  UPDATE user_state SET points = points + (
+    SELECT reward_points FROM achievements WHERE achv_script = 'nat_20_master'
+  ) WHERE id = 1;
+END;
+
+-- Centurion (100 rolls)
+CREATE TRIGGER IF NOT EXISTS trg_total_rolls_100
+AFTER INSERT ON roll_history
+-- Triggers when there are at least 100 rolls recorded
+WHEN (SELECT claimed FROM achievements WHERE achv_script = 'total_rolls_100') = 0
+  AND (SELECT total_rolls FROM user_state WHERE id = 1) >= 100
+BEGIN
+  UPDATE achievements SET claimed = 1 WHERE achv_script = 'total_rolls_100';
+  UPDATE user_state SET points = points + (
+    SELECT reward_points FROM achievements WHERE achv_script = 'total_rolls_100'
+  ) WHERE id = 1;
+END;
+
+-- Millenium (1000 rolls)
+CREATE TRIGGER IF NOT EXISTS trg_total_rolls_1000
+AFTER INSERT ON roll_history
+-- Triggers when there are at least 1000 rolls recorded
+WHEN (SELECT claimed FROM achievements WHERE achv_script = 'total_rolls_1000') = 0
+  AND (SELECT total_rolls FROM user_state WHERE id = 1) >= 1000
+BEGIN
+  UPDATE achievements SET claimed = 1 WHERE achv_script = 'total_rolls_1000';
+  UPDATE user_state SET points = points + (
+    SELECT reward_points FROM achievements WHERE achv_script = 'total_rolls_1000'
+  ) WHERE id = 1;
+END;
+
+-- Low Roller (first 1 rolled on a d20)
+CREATE TRIGGER IF NOT EXISTS trg_low_roller
+AFTER INSERT ON roll_history
+-- Triggers when the first 1 is rolled AND the die type is d20
+WHEN NEW.result = 1
+  AND NEW.die_type = 20
+  AND (SELECT claimed FROM achievements WHERE achv_script = 'low_roller') = 0
+BEGIN
+  UPDATE achievements SET claimed = 1 WHERE achv_script = 'low_roller';
+  UPDATE user_state SET points = points + (
+    SELECT reward_points FROM achievements WHERE achv_script = 'low_roller'
+  ) WHERE id = 1;
+END;
+
+-- High Roller (Points exceed 1000)
+CREATE TRIGGER IF NOT EXISTS trg_high_roller
+AFTER UPDATE OF points ON user_state
+-- Trigger when stored points exceed 1000
+WHEN NEW.points >= 1000
+  AND (SELECT claimed FROM achievements WHERE achv_script = 'high_roller') = 0
+BEGIN
+  UPDATE achievements SET claimed = 1 WHERE achv_script = 'high_roller';
+  UPDATE user_state SET points = points + (
+    SELECT reward_points FROM achievements WHERE achv_script = 'high_roller'
+  ) WHERE id = 1;
+END;
