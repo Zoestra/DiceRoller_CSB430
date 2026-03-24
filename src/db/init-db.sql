@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS dice_sets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   set_name TEXT NOT NULL,
   attitude TEXT NOT NULL DEFAULT 'Balanced',
+  betrayer_turn_after INTEGER,
+  roll_count INTEGER NOT NULL DEFAULT 0,
   owned INTEGER NOT NULL DEFAULT 0,
   equipped INTEGER NOT NULL DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -42,12 +44,29 @@ CREATE TABLE IF NOT EXISTS roll_history (
 
 -- ============================================
 -- TRIGGER: after_roll_insert
--- Auto-increment total_rolls when a roll is inserted
+-- Auto-increment total_rolls and per-set roll_count when a roll is inserted
 -- ============================================
 CREATE TRIGGER IF NOT EXISTS after_roll_insert
 AFTER INSERT ON roll_history
 BEGIN
   UPDATE user_state SET total_rolls = total_rolls + 1 WHERE id = 1;
+  UPDATE dice_sets SET roll_count = roll_count + 1 WHERE id = NEW.set_id;
+END;
+
+-- ============================================
+-- TRIGGER: initialize_betrayer_turn_after
+-- On first purchase of a Betrayer set, lock hidden turn point (21-99)
+-- ============================================
+CREATE TRIGGER IF NOT EXISTS initialize_betrayer_turn_after
+AFTER UPDATE OF owned ON dice_sets
+WHEN NEW.attitude = 'Betrayer'
+  AND NEW.owned = 1
+  AND IFNULL(OLD.owned, 0) = 0
+  AND NEW.betrayer_turn_after IS NULL
+BEGIN
+  UPDATE dice_sets
+  SET betrayer_turn_after = (ABS(RANDOM()) % 79) + 21
+  WHERE id = NEW.id;
 END;
 
 -- ============================================
@@ -90,14 +109,14 @@ CREATE INDEX IF NOT EXISTS idx_roll_history_result ON roll_history(result);
 -- SEED DATA
 -- Default dice sets
 -- ============================================
-INSERT OR IGNORE INTO dice_sets (set_name, attitude, owned, equipped)
+INSERT OR IGNORE INTO dice_sets (set_name, attitude, betrayer_turn_after, roll_count, owned, equipped)
 VALUES
-  ('Classic', 'Balanced', 1, 1),
-  ('Lucky', 'Lucky', 0, 0),
-  ('Cursed', 'Cursed', 0, 0),
-  ('Chaotic', 'Chaotic', 0, 0),
-  ('Betrayer', 'Betrayer', 0, 0),
-  ('Mid', 'Mid', 0, 0);
+  ('Classic', 'Balanced', NULL, 0, 1, 1),
+  ('Lucky', 'Lucky', NULL, 0, 0, 0),
+  ('Cursed', 'Cursed', NULL, 0, 0, 0),
+  ('Chaotic', 'Chaotic', NULL, 0, 0, 0),
+  ('Betrayer', 'Betrayer', NULL, 0, 0, 0),
+  ('Mid', 'Mid', NULL, 0, 0, 0);
 
 -- ============================================
 -- SEED DATA

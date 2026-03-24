@@ -20,6 +20,7 @@
 import * as SQLite from 'expo-sqlite';
 
 // Implemented modules
+export { getBetrayerTurnAfter } from './diceSets.js';
 export { getDiceSetStats, getRollDistribution, getRollHistory, insertRoll } from './rollHistory.js';
 export { addPoints, deductPoints, DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from './userState.js';
 
@@ -40,6 +41,7 @@ let openDatabaseAsyncFn = SQLite.openDatabaseAsync;
 export async function getDB() {
   if (!db) {
     db = await openDatabaseAsyncFn(DB_NAME);
+    await db.execAsync('PRAGMA foreign_keys = ON;');
   }
   return db;
 }
