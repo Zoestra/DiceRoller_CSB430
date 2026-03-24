@@ -1,14 +1,21 @@
-import { Pressable, StyleSheet, FlatList } from 'react-native';
-import { ThemedView } from '../../components/themed-view';
+/**
+ * Dice Collection screen — renders die thumbnails using lightweight outline SVGs.
+ *
+ * Minimal addition for roll/stat-screen branch to avoid importing large embedded SVGs.
+ * NOTE: This file was written with AI assistance (GitHub Copilot).
+ */
+
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import D10 from '../../../assets/images/Dice_Blanks/D10_outline.svg';
+import D12 from '../../../assets/images/Dice_Blanks/D12_outline.svg';
+import D20 from '../../../assets/images/Dice_Blanks/D20_outline.svg';
+import D4 from '../../../assets/images/Dice_Blanks/D4_outline.svg';
+import D6 from '../../../assets/images/Dice_Blanks/D6_outline.svg';
+import D8 from '../../../assets/images/Dice_Blanks/D8_outline.svg';
 import { ThemedText } from '../../components/themed-text';
-import { useDiceContext } from '../../DiceContext';
+import { ThemedView } from '../../components/themed-view';
 import { useSettings } from '../../context/SettingsContext';
-import D4 from '../../../assets/images/Dice_Blanks/D4.svg';
-import D6 from '../../../assets/images/Dice_Blanks/D6_Blank.svg';
-import D8 from '../../../assets/images/Dice_Blanks/d8.svg';
-import D10 from '../../../assets/images/Dice_Blanks/d10.svg';
-import D12 from '../../../assets/images/Dice_Blanks/d12.svg';
-import D20 from '../../../assets/images/Dice_Blanks/d20.svg';
+import { useDiceContext } from '../../DiceContext';
 
 const CLASSIC_DICE = [
   { dieType: 4, label: 'd4' },
@@ -33,21 +40,15 @@ export default function DiceCollectionScreen() {
   const { textSize } = useSettings();
 
   function handlePress(dieType) {
-    // The inspector screen isn't implemented yet.
-    // This will be replaced with router.push() once that screen exists.
     setActiveDieType(dieType);
     console.log(`Selected die type: d${dieType}`);
   }
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={[styles.header, { fontSize: textSize + 6 }]}>
-        Dice Collection
-      </ThemedText>
+      <ThemedText type="title" style={[styles.header, { fontSize: textSize + 6 }]}>Dice Collection</ThemedText>
 
-      <ThemedText style={[styles.subheader, { fontSize: textSize }]}>
-        Equipped Set ID: {equippedSetId}
-      </ThemedText>
+      <ThemedText style={[styles.subheader, { fontSize: textSize }]}>Equipped Set ID: {equippedSetId}</ThemedText>
 
       <FlatList
         data={CLASSIC_DICE}
@@ -63,10 +64,10 @@ export default function DiceCollectionScreen() {
               onPress={() => handlePress(item.dieType)}
               style={[styles.card, isActive && styles.activeCard]}
             >
-              <DiceImage width={64} height={64} />
-              <ThemedText style={[styles.cardText, { fontSize: textSize + 4 }]}>
-                {item.label}
-              </ThemedText>
+              <View style={{ width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
+                <DiceImage width={64} height={64} />
+              </View>
+              <ThemedText style={[styles.cardText, { fontSize: textSize + 4 }]}>{item.label}</ThemedText>
             </Pressable>
           );
         }}
