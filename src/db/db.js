@@ -161,11 +161,13 @@ export async function getDB() {
 export async function resetDatabase() {
   const database = await getDB();
   await database.execAsync(`
+    PRAGMA foreign_keys = OFF;
     DROP TABLE IF EXISTS roll_history;
     DROP TABLE IF EXISTS achievements;
-    DROP TABLE IF EXISTS skins;
     DROP TABLE IF EXISTS dice_sets;
+    DROP TABLE IF EXISTS skins;
     DROP TABLE IF EXISTS user_state;
+    PRAGMA foreign_keys = ON;
   `);
   db = null;
   dbPromise = null;
