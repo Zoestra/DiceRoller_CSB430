@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { DiceProvider } from '../DiceContext.js';
 import { SettingsProvider } from '../context/SettingsContext.jsx';
@@ -16,11 +17,13 @@ function LayoutWithSettings() {
 
   return (
     <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
+      <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: '#111' }}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </SafeAreaView>
     </ThemeProvider>
   );
 }
@@ -28,9 +31,11 @@ function LayoutWithSettings() {
 export default function RootLayout() {
   return (
     <SettingsProvider>
-      <DiceProvider>
-        <LayoutWithSettings />
-      </DiceProvider>
+      <SafeAreaProvider>
+        <DiceProvider>
+          <LayoutWithSettings />
+        </DiceProvider>
+      </SafeAreaProvider>
     </SettingsProvider>
   );
 }
