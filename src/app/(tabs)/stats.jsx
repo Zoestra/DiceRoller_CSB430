@@ -15,7 +15,7 @@ import { DiceTray } from '../../components/dice-tray.jsx';
 import { ThemedText } from '../../components/themed-text';
 
 export default function StatsScreen() {
-  const { activeDieType, points, setActiveDieType } = useDiceContext();
+  const { activeDieType, equippedSetId, points, setActiveDieType } = useDiceContext();
 
   return (
     <View style={styles.screen}>
@@ -29,7 +29,11 @@ export default function StatsScreen() {
       </View>
 
       <View style={styles.trayArea}>
-        <DiceTray activeDieType={activeDieType} onSelectDieType={setActiveDieType} />
+        <DiceTray
+          activeDieType={activeDieType}
+          onSelectDieType={setActiveDieType}
+          setId={equippedSetId ?? 1}
+        />
       </View>
     </View>
   );

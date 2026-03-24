@@ -8,31 +8,22 @@
  * ---
  */
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import TexturedDieFace from './textured-die-face.jsx';
 import { ThemedText } from './themed-text';
 
 const DIE_TYPES = [4, 6, 8, 10, 12, 20, 100];
-
-const DIE_ICON_BY_TYPE = {
-  4: 'dice-d4-outline',
-  6: 'dice-d6-outline',
-  8: 'dice-d8-outline',
-  10: 'dice-d10-outline',
-  12: 'dice-d12-outline',
-  20: 'dice-d20-outline',
-  100: 'dice-multiple-outline',
-};
 
 /**
  * @param {{
  *   activeDieType: number,
  *   onSelectDieType: (dieType: number) => void,
+ *   setId?: number,
  *   style?: import('react-native').StyleProp<import('react-native').ViewStyle>
  * }} props
  */
-export function DiceTray({ activeDieType, onSelectDieType, style }) {
+export function DiceTray({ activeDieType, onSelectDieType, setId = 1, style }) {
   const availableDieTypes = DIE_TYPES.filter(function (dieType) {
     return dieType !== activeDieType;
   });
@@ -50,7 +41,26 @@ export function DiceTray({ activeDieType, onSelectDieType, style }) {
               onPress={function handlePress() {
                 onSelectDieType(dieType);
               }}>
-              <MaterialCommunityIcons name={DIE_ICON_BY_TYPE[dieType]} size={28} color="#111" />
+              <View style={styles.diePreviewFrame}>
+                {dieType === 100 ? (
+                  <View style={styles.d100Preview}>
+                    <View style={styles.d100RightDie}>
+                      <TexturedDieFace setId={setId} dieType={10} size={24} hideLabel />
+                    </View>
+                    <View style={styles.d100LeftDie}>
+                      <TexturedDieFace
+                        setId={setId}
+                        dieType={10}
+                        size={24}
+                        hideLabel
+                        backgroundFill="#fff"
+                      />
+                    </View>
+                  </View>
+                ) : (
+                  <TexturedDieFace setId={setId} dieType={dieType} size={30} hideLabel />
+                )}
+              </View>
               <ThemedText style={styles.dieLabel}>{dieType}</ThemedText>
             </Pressable>
           );
@@ -80,6 +90,26 @@ const styles = StyleSheet.create({
     width: 40,
     alignItems: 'center',
     justifyContent: 'flex-end',
+  },
+  diePreviewFrame: {
+    width: 34,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  d100Preview: {
+    width: 34,
+    height: 28,
+  },
+  d100RightDie: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  d100LeftDie: {
+    position: 'absolute',
+    left: 0,
+    top: 4,
   },
   dieLabel: {
     marginTop: 3,

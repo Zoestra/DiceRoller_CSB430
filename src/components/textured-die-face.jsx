@@ -132,6 +132,8 @@ export default function TexturedDieFace({
   dieType = 20,
   resultValue = null,
   displayLabel = null,
+  backgroundFill = null,
+  hideLabel = false,
   labelX = 25,
   labelY = 29,
   labelHaloOffsetY = 0.35,
@@ -230,6 +232,15 @@ export default function TexturedDieFace({
         </Pattern>
       </Defs>
 
+      {backgroundFill ? (
+        <G transform={geometry.groupTransform}>
+          {renderPathShape(geometry.outline, {
+            fill: backgroundFill,
+            stroke: 'none',
+          })}
+        </G>
+      ) : null}
+
       {/* Layer 1: Texture clipped to die shape */}
       <Rect
         x="0"
@@ -266,26 +277,30 @@ export default function TexturedDieFace({
         })}
       </G>
 
-      <SvgText
-        x={labelX}
-        y={labelY + labelHaloOffsetY}
-        textAnchor="middle"
-        fontSize={resolvedLabelFontSize + 0.35}
-        fontWeight="900"
-        fill="#FFFFFF"
-        fillOpacity={0.72}>
-        {displayValue}
-      </SvgText>
+      {hideLabel ? null : (
+        <>
+          <SvgText
+            x={labelX}
+            y={labelY + labelHaloOffsetY}
+            textAnchor="middle"
+            fontSize={resolvedLabelFontSize + 0.35}
+            fontWeight="900"
+            fill="#FFFFFF"
+            fillOpacity={0.72}>
+            {displayValue}
+          </SvgText>
 
-      <SvgText
-        x={labelX}
-        y={labelY}
-        textAnchor="middle"
-        fontSize={resolvedLabelFontSize}
-        fontWeight="900"
-        fill={skinData.edgeColor}>
-        {displayValue}
-      </SvgText>
+          <SvgText
+            x={labelX}
+            y={labelY}
+            textAnchor="middle"
+            fontSize={resolvedLabelFontSize}
+            fontWeight="900"
+            fill={skinData.edgeColor}>
+            {displayValue}
+          </SvgText>
+        </>
+      )}
     </Svg>
   );
 }

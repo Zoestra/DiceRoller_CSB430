@@ -75,6 +75,13 @@ export default function RollScreen() {
     [equippedSetId]
   );
 
+  useEffect(
+    function resetDisplayedResultOnDieChange() {
+      setLastResult(null);
+    },
+    [activeDieType]
+  );
+
   async function handleRollPress() {
     if (isRolling) {
       return;
@@ -159,7 +166,11 @@ export default function RollScreen() {
       </View>
 
       <View style={styles.bottomArea}>
-        <DiceTray activeDieType={activeDieType} onSelectDieType={setActiveDieType} />
+        <DiceTray
+          activeDieType={activeDieType}
+          onSelectDieType={setActiveDieType}
+          setId={equippedSetId ?? 1}
+        />
 
         <Pressable style={styles.rollButton} onPress={handleRollPress}>
           {isRolling ? (
