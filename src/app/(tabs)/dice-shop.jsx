@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import DiceView from '../../components/textured-die';
 import PurchaseButton from '../../components/purchase-button';
-import { getDB } from '@/db/db';
+import { getDB } from '../../db/db';
 
 export default function ShopScreen() {
   return (
