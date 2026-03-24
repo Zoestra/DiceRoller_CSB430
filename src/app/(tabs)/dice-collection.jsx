@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, FlatList } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
-import { useDiceContext } from '@/context/DiceContext';
-import { useSettings } from '@/context/SettingsContext';
+import { ThemedView } from '../../components/themed-view';
+import { ThemedText } from '../../components/themed-text';
+import { useDiceContext } from '../../context/DiceContext';
+import { useSettings } from '../../context/SettingsContext';
 
 const CLASSIC_DICE = [
   { dieType: 4, label: 'd4' },
