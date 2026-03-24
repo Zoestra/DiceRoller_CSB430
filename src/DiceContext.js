@@ -10,7 +10,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import { DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from '@/db/db.js';
+import { DEFAULT_POINTS, getActiveSetId, getPoints, setActiveSetId, setPoints } from '@/db/userState.js';
 
 const DiceContext = createContext(null);
 

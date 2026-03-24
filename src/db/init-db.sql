@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS skins (
   skin_name TEXT NOT NULL,
   skin_description TEXT,
   skin_folder TEXT NOT NULL,
+  skin_fill_color CHAR(7) DEFAULT '#e0e0e0',
+  skin_edge_color CHAR(7) DEFAULT '#000000',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

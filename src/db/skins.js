@@ -31,4 +31,16 @@ export async function getSkinByID(skinID) {
     );
 }
 
-//
+// Add a new skin / texture combo
+export async function addNewSkin() {
+
+}
+
+// Get skin by set ID
+export async function getSkinBySetID(setID) {
+    const database = await getDB();
+    return await database.getFirstAsync(
+        'SELECT s.skin_folder, s.skin_name FROM dice_sets ds JOIN skins s ON ds.set_skin = s.id WHERE ds.id = ?',
+        setID
+    );
+}
