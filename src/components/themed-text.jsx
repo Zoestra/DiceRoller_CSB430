@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useSettings } from '@/context/SettingsContext';
+import { useThemeColor } from '../hooks/use-theme-color.js';
+import { useSettings } from '../context/SettingsContext.jsx';
 
 export function ThemedText({
   style,
