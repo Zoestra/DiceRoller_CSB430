@@ -31,23 +31,23 @@ function randomFromValues(values) {
   return values[randomIndex];
 }
 
-function randomFromBuckets(weightedBuckets) {
-  const totalWeight = weightedBuckets.reduce(function (sum, bucket) {
-    return sum + bucket.weight;
+function randomFromTables(weightedTables) {
+  const totalWeight = weightedTables.reduce(function (sum, table) {
+    return sum + table.weight;
   }, 0);
   let target = Math.random() * totalWeight;
 
-  for (const bucket of weightedBuckets) {
-    target -= bucket.weight;
+  for (const table of weightedTables) {
+    target -= table.weight;
     if (target <= 0) {
-      return randomFromValues(bucket.values);
+      return randomFromValues(table.values);
     }
   }
 
-  return randomFromValues(weightedBuckets[weightedBuckets.length - 1].values);
+  return randomFromValues(weightedTables[weightedTables.length - 1].values);
 }
 
-function getLuckyBuckets(dieType) {
+function getLuckyTables(dieType) {
   const threshold = Math.ceil(dieType * 0.6);
   const high = [];
   const low = [];
