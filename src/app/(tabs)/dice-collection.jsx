@@ -3,6 +3,12 @@ import { ThemedView } from '../../components/themed-view';
 import { ThemedText } from '../../components/themed-text';
 import { useDiceContext } from '../../DiceContext';
 import { useSettings } from '../../context/SettingsContext';
+import D4 from '../../assets/images/Dice_Blanks/D4.svg';
+import D6 from '../../assets/images/Dice_Blanks/D6_Blank.svg';
+import D8 from '../../assets/images/Dice_Blanks/d8.svg';
+import D10 from '../../assets/images/Dice_Blanks/d10.svg';
+import D12 from '../../assets/images/Dice_Blanks/d12.svg';
+import D20 from '../../assets/images/Dice_Blanks/d20.svg';
 
 const CLASSIC_DICE = [
   { dieType: 4, label: 'd4' },
@@ -12,6 +18,15 @@ const CLASSIC_DICE = [
   { dieType: 12, label: 'd12' },
   { dieType: 20, label: 'd20' },
 ];
+
+const DICE_IMAGES = {
+  4: D4,
+  6: D6,
+  8: D8,
+  10: D10,
+  12: D12,
+  20: D20,
+};
 
 export default function DiceCollectionScreen() {
   const { activeDieType, setActiveDieType, equippedSetId } = useDiceContext();
@@ -41,12 +56,14 @@ export default function DiceCollectionScreen() {
         contentContainerStyle={styles.grid}
         renderItem={({ item }) => {
           const isActive = item.dieType === activeDieType;
+          const DiceImage = DICE_IMAGES[item.dieType];
 
           return (
             <Pressable
               onPress={() => handlePress(item.dieType)}
               style={[styles.card, isActive && styles.activeCard]}
             >
+              <DiceImage width={64} height={64} />
               <ThemedText style={[styles.cardText, { fontSize: textSize + 4 }]}>
                 {item.label}
               </ThemedText>
