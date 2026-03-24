@@ -46,6 +46,12 @@ describe('rollLogic#rollDie', function () {
     await createFreshTestDatabase();
     __setOpenDatabaseForTests(getOpenDatabaseAsyncForTests());
     __resetDbForTests();
+
+    // Pre-claim first_roll so the trigger doesn't interfere with point assertions
+    const db = await getDB();
+    await db.runAsync(
+      "UPDATE achievements SET claimed = 1 WHERE achv_script = 'first_roll'"
+    )
   });
 
   afterEach(async function () {
