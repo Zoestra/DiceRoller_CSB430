@@ -42,9 +42,6 @@ app-example
 /ios
 /android
 
-# other
-/.agent-info
-
 # test coverage reports
 /coverage
 
